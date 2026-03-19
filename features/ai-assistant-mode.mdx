@@ -62,15 +62,15 @@ You can change this at any time in **Settings → Hotkeys**.
 
 ## Screenshot context (optional)
 
-When **Screen context** is enabled in **Settings → Assistant**, AutoQuill captures a screenshot before sending the request to the AI. The screenshot is encoded as base64 and included as an image in the API request, giving the model visual context about what is on your screen.
+When **Auto-capture Screenshot** is enabled in **Settings → Assistant → Screenshot Settings**, AutoQuill captures a screenshot when the assistant hotkey is pressed. The screenshot is encoded as base64 and included as an image in the API request, giving the model visual context about what is on your screen. This setting is **enabled by default**.
 
 <Note>
-  Screenshot context requires a model that supports vision/multimodal input. Check the model list in **Settings → Assistant** to confirm support.
+  Screenshot capture requires **Screen Recording** permission in macOS. If you haven't granted it, AutoQuill will notify you when the feature first attempts a capture.
 </Note>
 
 ## Model selection
 
-AI Assistant Mode uses the model configured under **Settings → Assistant → Model**. The default model is `meta-llama/llama-4-scout-17b-16e-instruct`. You can switch to any model available through your Groq API key.
+AI Assistant Mode uses the model configured under **Settings → Assistant → Model**. The default model is `llama3-70b-8192`. You can switch to any of the three available models from the Assistant settings page.
 
 API parameters used for all requests:
 

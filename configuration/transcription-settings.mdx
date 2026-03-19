@@ -120,14 +120,14 @@ The **Turbo** model is recommended for most users. Download it from the model se
   <Step title="Generate an access token">
     Navigate to **Settings → Access Tokens** in the Hugging Face interface and create a token with **Read** permissions.
   </Step>
-  <Step title="Run the setup script">
-    In a Terminal window, run the setup script bundled with AutoQuill:
+  <Step title="Set the environment variable">
+    In a Terminal window, export your token so AutoQuill can use it for model downloads:
 
     ```bash
-    ./setup_hf_token.sh
+    export HUGGING_FACE_HUB_TOKEN="your_token_here"
     ```
 
-    Paste your token when prompted. The script stores it in the environment so AutoQuill can use it for model downloads.
+    Then relaunch AutoQuill from the same Terminal session, or add the export to your shell profile (`~/.zshrc`) so it persists across sessions.
   </Step>
 </Steps>
 

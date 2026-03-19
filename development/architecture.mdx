@@ -76,7 +76,7 @@ Every feature module uses the BLoC pattern:
 
 ```dart
 // Example: dispatching an event from a widget
-context.read<TranscriptionBloc>().add(StartTranscriptionEvent());
+context.read<TranscriptionBloc>().add(InitializeTranscription());
 
 // Example: reacting to state in the UI
 BlocBuilder<TranscriptionBloc, TranscriptionState>(
@@ -145,7 +145,7 @@ Future<void> init() async {
   </Accordion>
 
   <Accordion title="SmartTranscriptionService — lib/features/transcription/services/smart_transcription_service.dart">
-    Wraps the Groq transcription API. Accepts raw audio bytes, submits them to Groq's Whisper endpoint, and returns the transcribed text. Handles rate-limit errors and provides user-facing error messages.
+    Optional post-processing layer that enhances raw transcription output. Sends the transcribed text to Groq's `llama-3.3-70b-versatile` model with a strict formatting prompt that converts spoken instructions into formatted output (emoji, case, lists, URLs, symbols). Applies a 4-second timeout and falls back to the original text if the API is too slow.
   </Accordion>
 
   <Accordion title="SettingsService — lib/core/settings/settings_service.dart">
