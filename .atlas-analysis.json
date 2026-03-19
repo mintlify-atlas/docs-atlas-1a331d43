@@ -1,0 +1,96 @@
+{
+  "projectType": "saas",
+  "projectName": "AutoQuill AI",
+  "projectDescription": "A professional AI-powered audio transcription macOS application that converts speech to text system-wide using global hotkeys, with multiple transcription modes and smart text enhancement.",
+  "theme": "almond",
+  "primaryColor": "#94cb04",
+  "lightColor": "#545454",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/standard-transcription",
+              "features/push-to-talk",
+              "features/ai-assistant-mode",
+              "features/phrase-replacement",
+              "features/hotkeys"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/api-setup",
+              "configuration/hotkey-customization",
+              "configuration/transcription-settings",
+              "configuration/auto-updates"
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "pages": [
+              "troubleshooting/common-issues",
+              "troubleshooting/microphone-permissions",
+              "troubleshooting/model-download"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Development",
+        "groups": [
+          {
+            "group": "Contributing",
+            "pages": [
+              "development/setup",
+              "development/architecture",
+              "development/contributing"
+            ]
+          },
+          {
+            "group": "Build & Distribution",
+            "pages": [
+              "development/build",
+              "development/distribution"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "System-wide audio transcription via global hotkeys",
+    "Three transcription modes: Standard, Push-to-Talk, and AI Assistant",
+    "Groq API integration for fast, accurate AI transcription",
+    "Smart text enhancement with auto-punctuation and phrase replacement",
+    "WhisperKit support for optional local/offline transcription",
+    "Customizable hotkey system with conflict detection",
+    "Real-time recording overlay with visual and audio feedback",
+    "Automatic clipboard copy and paste integration",
+    "Hive-based local storage for privacy-first data handling",
+    "Seamless auto-updates via Sparkle framework",
+    "BLoC state management with Clean Architecture",
+    "Light and dark theme support"
+  ],
+  "publicApiSurface": [
+    "HotkeyHandler (lib/features/hotkeys/core/hotkey_handler.dart)",
+    "AssistantService (lib/features/assistant/assistant_service.dart)",
+    "SmartTranscriptionService (lib/features/transcription/services/smart_transcription_service.dart)",
+    "PhraseReplacementService (lib/features/transcription/services/phrase_replacement_service.dart)",
+    "SettingsService (lib/core/settings/settings_service.dart)",
+    "AppStorage (lib/core/storage/app_storage.dart)",
+    "ClipboardListenerService (lib/features/assistant/clipboard_listener_service.dart)"
+  ]
+}
