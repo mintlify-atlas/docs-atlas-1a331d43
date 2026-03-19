@@ -1,0 +1,145 @@
+---
+title: "AI Assistant Mode"
+description: "Voice-driven AI text enhancement and generation that edits selected text or creates new content from your spoken instructions."
+---
+
+AI Assistant Mode combines voice input with a large language model to let you edit existing text or generate new content entirely by speaking. Select text you want to change, trigger the hotkey, dictate an instruction — and AutoQuill delivers the AI-processed result directly to your clipboard.
+
+## Default hotkey
+
+**Alt/Option + Shift + S**
+
+You can change this at any time in **Settings → Hotkeys**.
+
+## Two operating modes
+
+<Tabs>
+  <Tab title="Edit mode">
+    Select text in any application before pressing the hotkey. AutoQuill captures the selection via the clipboard, records your spoken instruction, and sends both to the AI with the format:
+
+    ```
+    [your instruction]: [selected text]
+    ```
+
+    The AI returns only the edited text — no preamble, no explanations — which AutoQuill copies to your clipboard and pastes in place of the original selection.
+
+    **Example:** Select a paragraph, press the hotkey, say *"make this more concise"* — the paragraph is rewritten and pasted back.
+  </Tab>
+  <Tab title="Generation mode">
+    Don't select any text before pressing the hotkey (or let the clipboard detection time out). AutoQuill records your spoken instruction and sends it to the AI as a standalone generation request.
+
+    The AI returns the generated text directly, which is copied to your clipboard for pasting wherever you need it.
+
+    **Example:** Press the hotkey without selecting anything, say *"write a two-sentence summary of a REST API"* — the generated text lands on your clipboard.
+  </Tab>
+</Tabs>
+
+## How it works
+
+<Steps>
+  <Step title="(Optional) Select text">
+    Highlight text in any application if you want to edit it. AutoQuill will detect the selection automatically.
+  </Step>
+  <Step title="Press the hotkey">
+    Press **⌥ ⇧ S**. AutoQuill displays *"Assistant mode activated"* and silently simulates **⌘C** to capture any selected text via the clipboard listener.
+  </Step>
+  <Step title="Wait for the recording prompt">
+    If text was detected, AutoQuill shows how many characters were captured and prompts you to record your instruction. If no text is detected (timeout or empty clipboard), it enters generation mode and prompts you to record.
+  </Step>
+  <Step title="Speak your instruction">
+    Dictate your instruction or generation prompt. The overlay shows *"Assistant"* mode with the hotkey reminder.
+  </Step>
+  <Step title="Press the hotkey again to stop">
+    Press **⌥ ⇧ S** again to stop recording. AutoQuill transcribes your instruction via the Groq API.
+  </Step>
+  <Step title="AI processing">
+    The transcribed instruction — along with selected text if available — is sent to the configured AI model. The model is prompted to return only the output text with no introductory phrases.
+  </Step>
+  <Step title="Result delivery">
+    The AI response is copied to your clipboard and auto-pasted into the active text field. The overlay hides automatically.
+  </Step>
+</Steps>
+
+## Screenshot context (optional)
+
+When **Screen context** is enabled in **Settings → Assistant**, AutoQuill captures a screenshot before sending the request to the AI. The screenshot is encoded as base64 and included as an image in the API request, giving the model visual context about what is on your screen.
+
+<Note>
+  Screenshot context requires a model that supports vision/multimodal input. Check the model list in **Settings → Assistant** to confirm support.
+</Note>
+
+## Model selection
+
+AI Assistant Mode uses the model configured under **Settings → Assistant → Model**. The default model is `meta-llama/llama-4-scout-17b-16e-instruct`. You can switch to any model available through your Groq API key.
+
+API parameters used for all requests:
+
+| Parameter | Value |
+|---|---|
+| `temperature` | `0.2` (low, for deterministic output) |
+| `max_tokens` | `2000` |
+| `stream` | `false` |
+
+## Cancelling
+
+Press **Esc** at any stage — during selection detection, during recording, or while the AI request is processing — to cancel the entire operation. Any ongoing transcription or API request is abandoned and the overlay is hidden.
+
+## Usage examples
+
+<AccordionGroup>
+  <Accordion title="Rewrite for tone">
+    Select an email draft, press the hotkey, say: *"rewrite this in a more professional tone"*
+    
+    The selected text is replaced with the AI's rewritten version.
+  </Accordion>
+  <Accordion title="Fix grammar">
+    Select a sentence, press the hotkey, say: *"fix the grammar"*
+    
+    The corrected sentence is pasted back in place.
+  </Accordion>
+  <Accordion title="Generate a code comment">
+    Place your cursor above a function, press the hotkey without selecting anything, say: *"write a docstring for a function that sorts a list of user objects by last name"*
+    
+    The generated docstring is on your clipboard, ready to paste.
+  </Accordion>
+  <Accordion title="Summarise text">
+    Select a long paragraph, press the hotkey, say: *"summarise this in one sentence"*
+    
+    A one-sentence summary replaces the selection.
+  </Accordion>
+  <Accordion title="Translate selected text">
+    Select text, press the hotkey, say: *"translate this to French"*
+    
+    The translated text is pasted in place.
+  </Accordion>
+</AccordionGroup>
+
+## Requirements
+
+- A valid **Groq API key** configured in **Settings → API Configuration**
+- **Microphone permission** for recording
+- **Accessibility permission** for auto-paste and clipboard simulation
+
+<Note>
+  AI Assistant Mode always uses the Groq cloud API — it does not fall back to local WhisperKit models. Ensure you have a valid API key before using this mode.
+</Note>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="'No API key found' notification">
+    Add your Groq API key in **Settings → API Configuration**. AI Assistant Mode requires a cloud API key and will not function without one.
+  </Accordion>
+  <Accordion title="Selected text isn't being captured">
+    AutoQuill simulates ⌘C to copy the selection. If the active app doesn't support standard copy shortcuts, the clipboard may not update. In this case, manually copy the text (⌘C) before pressing the hotkey.
+  </Accordion>
+  <Accordion title="AI response contains introductory phrases">
+    The system prompt instructs the model not to include preambles. If you see them, try switching to a different model in **Settings → Assistant → Model**.
+  </Accordion>
+  <Accordion title="Screenshot capture fails">
+    Grant **Screen Recording** permission in **System Settings → Privacy & Security → Screen Recording**, then restart AutoQuill.
+  </Accordion>
+  <Accordion title="API error status codes">
+    A 401 error means your API key is invalid. A 429 error means you have hit a rate limit. Check your Groq dashboard and verify your key and quota.
+  </Accordion>
+</AccordionGroup>

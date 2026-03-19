@@ -1,0 +1,153 @@
+---
+title: "Developer environment setup"
+description: "Set up your local environment to build and run AutoQuill AI from source on macOS."
+---
+
+<Note>
+  AutoQuill AI requires macOS for both development and testing. All tooling runs natively on macOS with Xcode and Flutter.
+</Note>
+
+## Prerequisites
+
+Before cloning the repository, install and verify the following tools.
+
+<Steps>
+  <Step title="Install Flutter SDK">
+    Download and install Flutter from the [official install guide](https://docs.flutter.dev/get-started/install). AutoQuill AI requires Flutter SDK **3.1.3 or later** (Dart `>=3.1.3 <4.0.0`).
+
+    After installation, verify your setup:
+
+    ```bash
+    flutter doctor
+    ```
+
+    Resolve any issues reported by `flutter doctor` before continuing.
+  </Step>
+
+  <Step title="Install Xcode">
+    Install Xcode from the Mac App Store, then install the command line tools:
+
+    ```bash
+    xcode-select --install
+    ```
+
+    Xcode is required for macOS builds and for compiling the Swift platform layer in `macos/Runner/`.
+  </Step>
+
+  <Step title="Install CocoaPods">
+    CocoaPods manages the native macOS dependencies declared in `macos/Podfile`, including the Sparkle auto-update framework.
+
+    ```bash
+    sudo gem install cocoapods
+    ```
+  </Step>
+
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/DevelopedByDev/autoquill_ai.git
+    cd autoquill_ai
+    ```
+  </Step>
+
+  <Step title="Install Flutter dependencies">
+    Fetch all Dart and Flutter packages declared in `pubspec.yaml`:
+
+    ```bash
+    flutter pub get
+    ```
+  </Step>
+
+  <Step title="Install CocoaPods dependencies">
+    Install the native macOS pods required by the Runner target:
+
+    ```bash
+    cd macos && pod install && cd ..
+    ```
+  </Step>
+
+  <Step title="Generate app icons">
+    The launcher icons are generated from `assets/icons/with_bg/AQOL.png` using the `flutter_launcher_icons` package:
+
+    ```bash
+    flutter pub run flutter_launcher_icons
+    ```
+  </Step>
+
+  <Step title="Run the app in debug mode">
+    Launch AutoQuill AI on the macOS target:
+
+    ```bash
+    flutter run -d macos
+    ```
+
+    The app will open as a menu-bar application. Grant microphone and accessibility permissions when prompted.
+  </Step>
+</Steps>
+
+## System requirements
+
+| Requirement | Minimum |
+|---|---|
+| macOS | 10.14 (Mojave) or later |
+| Flutter SDK | 3.1.3+ |
+| Xcode | Latest stable |
+| RAM | 4 GB (8 GB recommended) |
+| Disk | 100 MB for app installation |
+
+## Key dependencies
+
+The following packages from `pubspec.yaml` are central to the application:
+
+<CardGroup cols={2}>
+  <Card title="flutter_bloc" icon="layer-group">
+    State management across all feature modules using the BLoC pattern.
+  </Card>
+  <Card title="hive / hive_flutter" icon="database">
+    Local data persistence for settings, hotkeys, and transcription history.
+  </Card>
+  <Card title="hotkey_manager" icon="keyboard">
+    System-wide global hotkey registration and handling.
+  </Card>
+  <Card title="record" icon="microphone">
+    Cross-platform audio recording from the system microphone.
+  </Card>
+  <Card title="get_it" icon="plug">
+    Service locator for dependency injection across the app.
+  </Card>
+  <Card title="auto_updater" icon="arrows-rotate">
+    Sparkle-based automatic update detection and installation.
+  </Card>
+  <Card title="tray_manager" icon="window">
+    macOS system tray icon and menu management.
+  </Card>
+  <Card title="desktop_multi_window" icon="table-columns">
+    Multi-window support for the recording overlay window.
+  </Card>
+</CardGroup>
+
+## Verifying your setup
+
+Run these commands to confirm everything is working before you start developing:
+
+```bash
+# Lint the codebase
+flutter analyze
+
+# Run unit tests
+flutter test
+
+# Build a debug binary
+flutter build macos --debug
+```
+
+<Tip>
+  If you encounter build errors after pulling new changes, run a full clean before rebuilding:
+
+  ```bash
+  flutter clean
+  rm -rf macos/Pods
+  cd macos && pod install && cd ..
+  flutter pub get
+  flutter build macos
+  ```
+</Tip>

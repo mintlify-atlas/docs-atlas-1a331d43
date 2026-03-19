@@ -1,97 +1,74 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "AutoQuill AI"
+description: "Professional AI-powered audio transcription for macOS. Convert speech to text system-wide, instantly."
 ---
 
-## Setting up
-
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Get transcribing in under 5 minutes with your API key
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Installation" icon="download" href="/installation">
+    Download and install AutoQuill AI on your Mac
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Core Features" icon="microphone" href="/features/standard-transcription">
+    Explore the three transcription modes and smart features
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Configuration" icon="gear" href="/configuration/api-setup">
+    Set up your API keys, hotkeys, and preferences
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What is AutoQuill AI?
 
-Everything you need to create world-class documentation.
+AutoQuill AI is a system-wide audio transcription application for macOS that converts your speech into text anywhere on your computer. Press a global hotkey in any app — your code editor, email client, document editor, or chat window — speak, and your words appear as text instantly.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+It supports three distinct transcription modes for different workflows:
 
-## Need inspiration?
+<CardGroup cols={3}>
+  <Card title="Standard Transcription" icon="toggle-on" href="/features/standard-transcription">
+    Press once to start, press again to stop. Text is copied and ready to paste.
+  </Card>
+  <Card title="Push-to-Talk" icon="hand" href="/features/push-to-talk">
+    Hold a key while speaking. Release to transcribe instantly.
+  </Card>
+  <Card title="AI Assistant Mode" icon="wand-magic-sparkles" href="/features/ai-assistant-mode">
+    Select text, speak instructions, and AI refines or generates content for you.
+  </Card>
+</CardGroup>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="System-wide hotkeys" icon="keyboard">
+    Register global shortcuts that work in any application, not just AutoQuill
+  </Card>
+  <Card title="Groq API transcription" icon="bolt">
+    Fast, accurate AI transcription via Groq's cloud models
+  </Card>
+  <Card title="Phrase replacements" icon="arrow-right-arrow-left">
+    Define custom abbreviations that expand automatically after transcription
+  </Card>
+  <Card title="Privacy-first storage" icon="shield-halved">
+    All settings and API keys are stored locally using Hive — nothing leaves your device
+  </Card>
+  <Card title="Real-time overlay" icon="layer-group">
+    Non-intrusive recording indicator shows status without interrupting your workflow
+  </Card>
+  <Card title="Auto-updates" icon="arrows-rotate">
+    Seamless background updates via the Sparkle framework
+  </Card>
+</CardGroup>
+
+## System requirements
+
+| Requirement | Minimum |
+|---|---|
+| macOS | 10.14 (Mojave) or later |
+| RAM | 4 GB (8 GB recommended) |
+| Storage | 100 MB |
+| Microphone | Required |
+| Internet | Required for AI transcription |
+
+<Note>
+  AutoQuill AI requires an API key from [Groq](https://console.groq.com) for AI-powered transcription. The free tier is sufficient for most personal use.
+</Note>

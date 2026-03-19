@@ -1,0 +1,77 @@
+---
+title: "Auto-updates"
+description: "How AutoQuill AI checks for and installs updates using the Sparkle framework, and how to check for updates manually."
+---
+
+AutoQuill AI uses the [Sparkle](https://sparkle-project.org) framework to deliver automatic updates on macOS. Updates are distributed as signed ZIP archives and verified by Sparkle before installation.
+
+## How automatic updates work
+
+When AutoQuill launches, it initialises the auto-updater and sets a background check interval. The update feed URL is:
+
+```
+https://www.getautoquill.com/updates/appcast.xml
+```
+
+Sparkle fetches this appcast file on a schedule. If a newer version is listed, Sparkle presents a dialog describing the update and prompts you to install it.
+
+### Update check interval
+
+AutoQuill checks for updates automatically every **24 hours** (86,400 seconds). The check runs silently in the background. You are only prompted if an update is actually available.
+
+## Checking for updates manually
+
+You can trigger an immediate update check at any time without waiting for the scheduled interval.
+
+<Steps>
+  <Step title="Open General settings">
+    In AutoQuill, go to **Settings → General** and scroll to the **App Updates** section at the bottom of the page.
+  </Step>
+  <Step title="Click Check for Updates">
+    Click the **Check for Updates** button. AutoQuill contacts the update server and either presents the Sparkle update dialog (if a new version is available) or shows a brief confirmation that your installation is up to date.
+  </Step>
+</Steps>
+
+<Note>
+  The current version is shown in the App Updates section description. As of this writing the latest release is **v1.5.0**.
+</Note>
+
+## Update installation
+
+When Sparkle downloads an update, it:
+
+1. Verifies the cryptographic signature of the downloaded archive against AutoQuill's embedded public key.
+2. Extracts the new application bundle.
+3. Replaces the existing app and relaunches.
+
+Because AutoQuill uses a persistent data directory (`autoquill_persistent_data`) that is separate from the application bundle, your settings, API key, hotkeys, and transcription history survive the update.
+
+<Tip>
+  If AutoQuill detects that a version change occurred since the last launch (by comparing the stored version against the running version), it marks the session as post-update. This lets the app handle any permission or onboarding state that may need to be re-verified after an update.
+</Tip>
+
+## Post-update behaviour
+
+After an auto-update, AutoQuill checks whether essential data (API key, hotkeys, permission records) is still intact. In rare cases where a system update or permission reset affects stored data, AutoQuill may prompt you to re-enter your API key or re-grant permissions.
+
+<Warning>
+  macOS may revoke microphone or accessibility permissions after a major OS update regardless of AutoQuill updates. If recording stops working after an OS upgrade, go to **System Settings → Privacy & Security** and re-authorise AutoQuill for Microphone and Accessibility access.
+</Warning>
+
+## Disabling automatic update checks
+
+The Sparkle framework respects the user's choice to skip or defer updates when prompted. If you want to disable automatic background checks entirely, you can set the scheduled interval to `0` — but this is not exposed in the UI and requires a code change. For most users the default 24-hour interval is appropriate.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Check for Updates button shows no result">
+    The update server may be temporarily unavailable. AutoQuill fails silently in this case to avoid interrupting your workflow. Try again after a few minutes or check your internet connection.
+  </Accordion>
+  <Accordion title="Update dialog appeared but installation failed">
+    Ensure AutoQuill is installed in the `/Applications` folder. Sparkle needs write access to the application location to replace the bundle. If AutoQuill is in a read-only location, move it to `/Applications` and try again.
+  </Accordion>
+  <Accordion title="Settings were lost after updating">
+    AutoQuill stores settings in `~/Library/Application Support/autoquill_persistent_data`, which is not touched during updates. If settings are missing, check that the directory exists and is readable. You can open it from **Settings → General → Data Location → Open Data Folder**.
+  </Accordion>
+</AccordionGroup>

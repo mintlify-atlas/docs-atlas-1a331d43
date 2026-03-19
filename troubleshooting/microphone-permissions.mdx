@@ -1,0 +1,83 @@
+---
+title: "Microphone permissions"
+description: "How to grant, verify, and reset macOS microphone access for AutoQuill AI."
+---
+
+AutoQuill requires microphone access to capture audio for transcription. macOS controls microphone access on a per-app basis under **Privacy & Security**.
+
+## Grant microphone access
+
+<Steps>
+  <Step title="Open System Settings">
+    Click the Apple menu () → **System Settings**.
+
+    On macOS Ventura (13) or earlier, this is called **System Preferences**.
+  </Step>
+  <Step title="Go to Privacy & Security">
+    In the sidebar, select **Privacy & Security**, then click **Microphone**.
+  </Step>
+  <Step title="Enable AutoQuill AI">
+    Find **AutoQuill AI** in the list and toggle it on.
+
+    If AutoQuill is not listed, proceed to the next section.
+  </Step>
+  <Step title="Restart AutoQuill">
+    Quit AutoQuill completely and relaunch it. Permission changes require an app restart to take effect.
+  </Step>
+</Steps>
+
+<Note>
+  You must be logged in as an administrator to change Privacy & Security settings.
+</Note>
+
+## AutoQuill is not in the microphone list
+
+macOS only adds an app to the privacy list after it has attempted to access the resource. If AutoQuill has never requested microphone access, it will not appear in the list.
+
+<Steps>
+  <Step title="Trigger the permission prompt">
+    Launch AutoQuill and press the Standard Transcription hotkey (**⌥⇧Z** by default) to attempt a recording. macOS will display a permission dialog.
+  </Step>
+  <Step title="Click OK in the dialog">
+    When prompted, click **OK** to grant microphone access.
+  </Step>
+  <Step title="Confirm in System Settings">
+    Open **System Settings** → **Privacy & Security** → **Microphone** to verify the toggle is on.
+  </Step>
+</Steps>
+
+## Reset microphone permissions
+
+If AutoQuill's microphone access is stuck in a denied state or behaving unexpectedly, you can reset the permission using Terminal.
+
+<Warning>
+  This command resets microphone permissions for **all apps** on your system. Each app will prompt you for microphone access again the next time it needs it.
+</Warning>
+
+```bash
+tccutil reset Microphone
+```
+
+After running this command, relaunch AutoQuill. macOS will present the microphone permission dialog again — click **OK** to grant access.
+
+## Permission statuses
+
+AutoQuill checks microphone status on launch and reports one of the following states:
+
+| Status | Meaning |
+|---|---|
+| **Authorized** | Access granted. Recording is available. |
+| **Denied** | Access was explicitly denied. Open System Settings to re-enable. |
+| **Restricted** | A system policy (MDM, parental controls) is blocking access. Contact your administrator. |
+| **Not determined** | AutoQuill has not yet requested access. Trigger a recording to prompt the dialog. |
+
+## Additional permissions required
+
+Microphone access alone is not enough for all of AutoQuill's features. AutoQuill also requires:
+
+- **Accessibility** — needed to register global hotkeys and automate text insertion. Grant this in **System Settings** → **Privacy & Security** → **Accessibility**.
+- **Screen Recording** — needed to capture screenshots for AI context. The app restarts automatically after you grant this permission.
+
+<Tip>
+  AutoQuill's onboarding flow walks you through granting all three permissions in sequence. If you skipped it, go to **System Settings** → **Privacy & Security** and enable each permission for AutoQuill AI.
+</Tip>

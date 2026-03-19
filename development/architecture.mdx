@@ -1,0 +1,170 @@
+---
+title: "Architecture"
+description: "Clean Architecture and BLoC pattern used in AutoQuill AI, including project structure, layers, and key components."
+---
+
+AutoQuill AI follows **Clean Architecture** principles with the **BLoC pattern** for state management. This separation keeps business logic independent of the UI and platform, making the codebase testable and maintainable.
+
+## Architectural layers
+
+<CardGroup cols={2}>
+  <Card title="Presentation layer" icon="display">
+    Flutter widgets and BLoC classes. Widgets dispatch events; BLoCs emit states. No business logic lives here.
+  </Card>
+  <Card title="Domain layer" icon="sitemap">
+    Pure Dart business logic and repository interfaces. No Flutter or platform dependencies.
+  </Card>
+  <Card title="Data layer" icon="database">
+    API clients (Groq HTTP), local storage (Hive), and Flutter platform channels. Implements the domain repository interfaces.
+  </Card>
+  <Card title="Platform layer" icon="apple">
+    macOS-specific Swift code in `macos/Runner/`. Handles the recording overlay window, system permissions, and WhisperKit local inference.
+  </Card>
+</CardGroup>
+
+## Project structure
+
+```
+autoquill_ai/
+├── lib/
+│   ├── main.dart                          # Application entry point
+│   ├── core/
+│   │   ├── di/
+│   │   │   └── injection_container.dart   # GetIt service locator setup
+│   │   ├── settings/
+│   │   │   └── settings_service.dart      # Centralized settings management
+│   │   ├── storage/
+│   │   │   └── app_storage.dart           # Hive storage wrapper
+│   │   ├── theme/                         # App theming (light / dark)
+│   │   └── utils/                         # Shared utility functions
+│   └── features/
+│       ├── assistant/                     # AI assistant mode
+│       │   └── assistant_service.dart
+│       ├── hotkeys/                       # Global hotkey registration
+│       │   └── core/
+│       │       └── hotkey_handler.dart
+│       ├── onboarding/                    # First-run setup flow
+│       ├── recording/                     # Audio recording + overlay UI
+│       ├── settings/                      # Settings screens
+│       └── transcription/                 # Speech-to-text pipeline
+│           └── services/
+│               └── smart_transcription_service.dart
+├── assets/
+│   ├── icons/with_bg/                     # App icons (AQOL.png)
+│   ├── sounds/                            # Audio feedback (start/stop/error)
+│   └── fonts/                             # Inter typeface (400–700)
+└── macos/
+    ├── Runner/                            # Swift application code
+    │   ├── AppDelegate.swift
+    │   ├── MainFlutterWindow.swift
+    │   ├── RecordingOverlayWindow.swift    # Native overlay window
+    │   ├── PermissionService.swift        # macOS permission checks
+    │   ├── WhisperKitService.swift        # Local AI transcription
+    │   └── WaveformView.swift
+    ├── Podfile                            # CocoaPods dependencies
+    └── packaging/                         # Distribution assets
+```
+
+## State management
+
+Every feature module uses the BLoC pattern:
+
+- **Events** are immutable value objects that represent user intent or system triggers.
+- **States** are immutable snapshots of the feature's current condition.
+- **BLoCs** receive events, apply business logic, and emit new states.
+- All events and states extend `Equatable` for value-based equality.
+
+```dart
+// Example: dispatching an event from a widget
+context.read<TranscriptionBloc>().add(StartTranscriptionEvent());
+
+// Example: reacting to state in the UI
+BlocBuilder<TranscriptionBloc, TranscriptionState>(
+  builder: (context, state) {
+    if (state is TranscriptionInProgress) {
+      return RecordingIndicator();
+    }
+    return IdleView();
+  },
+);
+```
+
+## Dependency injection
+
+The app uses [GetIt](https://pub.dev/packages/get_it) as a service locator, configured in `lib/core/di/injection_container.dart`.
+
+All registrations use `registerLazySingleton`, so services are only instantiated when first accessed:
+
+```dart
+final sl = GetIt.instance;
+
+Future<void> init() async {
+  // Repositories
+  sl.registerLazySingleton<TranscriptionRepository>(
+    () => TranscriptionRepositoryImpl(localDataSource: sl()),
+  );
+  sl.registerLazySingleton<RecordingRepository>(
+    () => RecordingRepositoryImpl(dataSource: sl()),
+  );
+
+  // Data sources
+  sl.registerLazySingleton<TranscriptionLocalDataSource>(
+    () => TranscriptionLocalDataSourceImpl(transcriptionBox: sl()),
+  );
+
+  // External: Hive box opened at startup
+  final transcriptionBox = await Hive.openBox<String>('transcriptions');
+  sl.registerLazySingleton(() => transcriptionBox);
+}
+```
+
+## Storage
+
+`AppStorage` (`lib/core/storage/app_storage.dart`) provides a static wrapper over a Hive box named `settings`. It persists all app state in `~/Library/Application Support/autoquill_persistent_data/`.
+
+| Key | Type | Purpose |
+|---|---|---|
+| `groq_api_key` | String | Groq API key |
+| `is_onboarding_completed` | bool | First-run flag |
+| `transcription_hotkey` | Map | Standard transcription hotkey |
+| `assistant_hotkey` | Map | AI assistant hotkey |
+| `microphone_permission_status` | String | Cached permission state |
+| `accessibility_permission_status` | String | Cached permission state |
+| `screen_recording_permission_status` | String | Cached permission state |
+| `last_known_app_version` | String | Auto-update version tracking |
+
+## Key components
+
+<AccordionGroup>
+  <Accordion title="HotkeyHandler — lib/features/hotkeys/core/hotkey_handler.dart">
+    Singleton that owns all global hotkey registrations. Registration is deferred until after the first UI render to avoid blocking startup. The Escape key is hard-wired to cancel any active recording regardless of user configuration. Conflict detection prevents two hotkeys from sharing the same key combination.
+  </Accordion>
+
+  <Accordion title="AssistantService — lib/features/assistant/assistant_service.dart">
+    Handles the AI assistant mode workflow: reads selected text from the clipboard, combines it with a voice instruction, and sends both to the Groq API for text enhancement. Uses a persistent `http.Client` instance to avoid connection overhead between requests.
+  </Accordion>
+
+  <Accordion title="SmartTranscriptionService — lib/features/transcription/services/smart_transcription_service.dart">
+    Wraps the Groq transcription API. Accepts raw audio bytes, submits them to Groq's Whisper endpoint, and returns the transcribed text. Handles rate-limit errors and provides user-facing error messages.
+  </Accordion>
+
+  <Accordion title="SettingsService — lib/core/settings/settings_service.dart">
+    Centralizes access to all user-configurable preferences. Uses `ValueListenable` so widgets can reactively rebuild when settings change without requiring BLoC events.
+  </Accordion>
+
+  <Accordion title="AppStorage — lib/core/storage/app_storage.dart">
+    Static Hive wrapper that survives app auto-updates. Stores API keys, hotkey configurations, permission statuses, and onboarding state. Includes logic to detect auto-updates and preserve permission state across version changes.
+  </Accordion>
+</AccordionGroup>
+
+## Platform integration
+
+The `macos/Runner/` directory contains Swift files that bridge Flutter and macOS system APIs:
+
+| File | Purpose |
+|---|---|
+| `RecordingOverlayWindow.swift` | Non-activating overlay window displayed during recording |
+| `PermissionService.swift` | Checks and requests microphone, accessibility, and screen recording permissions |
+| `WhisperKitService.swift` | Runs local WhisperKit CoreML models for on-device transcription |
+| `WaveformView.swift` | Renders real-time audio waveform in the overlay |
+| `BlinkingLabel.swift` | Animated status label shown during active recording |

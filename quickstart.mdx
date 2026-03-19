@@ -1,80 +1,119 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Go from a fresh AutoQuill installation to your first transcription in five steps."
 ---
 
-## Get started in three steps
+This guide assumes you have already installed AutoQuill. If not, see [Installation](/installation) first.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Launch AutoQuill and start onboarding">
+    Open **AutoQuill** from your Applications folder. On first launch, AutoQuill displays the onboarding flow automatically.
 
-### Step 1: Set up your local environment
+    The welcome screen introduces the three core features:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    - **Transcribe Audio** — convert speech to clean text with a keyboard shortcut
+    - **AI Assistant** — edit and generate text with voice instructions
+    - **No login required** — you supply your own API key; no account needed
 
-### Step 2: Deploy your changes
+    Click **Continue** to proceed.
+  </Step>
+  <Step title="Grant required permissions">
+    AutoQuill needs three macOS permissions to function. The onboarding **Grant Permissions** screen walks you through each one.
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    | Permission | Why it is needed | How to grant |
+    |---|---|---|
+    | Microphone | Captures audio for transcription | Click **Grant Permission** when prompted |
+    | Accessibility | Enables global hotkeys and automatic text insertion | Click **Open Settings**, then add AutoQuill under **Privacy & Security → Accessibility** |
+    | Screen recording | Provides visual context for AI Assistant mode | Click **Grant Permission**; the app may need to restart |
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    <Warning>
+      Accessibility permission is mandatory for hotkeys to work in other applications. If you skip it, AutoQuill can only transcribe while its own window is focused.
+    </Warning>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    After granting each permission, click **Check Permissions Again** to refresh the status. Once all three show **Granted**, click **Continue**.
 
-### Step 3: Go live
+    <Note>
+      If microphone permission is denied, go to **System Preferences → Privacy & Security → Microphone**, enable AutoQuill, then restart the app.
+    </Note>
+  </Step>
+  <Step title="Add your Groq API key">
+    AutoQuill uses [Groq](https://console.groq.com) for AI-powered transcription. You need a free Groq API key to continue.
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    **Get your API key:**
 
-## Next steps
+    1. Create a free account at [groq.com](https://console.groq.com/keys)
+    2. Go to **API Keys** in your dashboard
+    3. Click **Create API key**, name it `AutoQuill`, and click **Submit**
+    4. Copy the key and click **Done**
 
-Now that you have your docs running, explore these key features:
+    **Enter your key in AutoQuill:**
+
+    Paste the key into the **Groq API Key** field on the **Connect to Groq** screen, then click **Validate Key**. AutoQuill confirms the key is valid before proceeding.
+
+    <Note>
+      Your API key is stored locally in the Hive database at `autoquill_persistent_data`. It is never transmitted to any server other than Groq's API endpoint during transcription.
+    </Note>
+  </Step>
+  <Step title="Set your hotkeys">
+    The **Set Your Shortcuts** screen shows the default hotkeys for each mode. You can keep the defaults or record new combinations now.
+
+    | Mode | Default hotkey |
+    |---|---|
+    | Standard transcription | `⌥ Shift Z` (Alt/Option + Shift + Z) |
+    | Push-to-Talk | `⌥ Space` (Alt/Option + Space) |
+    | AI Assistant | `⌥ Shift S` (Alt/Option + Shift + S) |
+
+    To change a hotkey, click the **edit** icon next to any shortcut and press your preferred key combination. AutoQuill detects conflicts between modes automatically.
+
+    You can also enable **Smart Transcription** here — it adds intelligent formatting, emoji conversion, and proper casing to your transcription output. It is slower than standard transcription but produces more polished results.
+
+    <Tip>
+      Use modifier keys (`⌥`, `⌃`, `⇧`, `⌘`) combined with a letter key for system-wide compatibility. Avoid shortcuts already used by macOS (e.g., `⌘ Space` for Spotlight).
+    </Tip>
+
+    Click **Continue** when done. AutoQuill saves your hotkeys and registers them system-wide.
+  </Step>
+  <Step title="Make your first transcription">
+    AutoQuill is now set up. Open any application with a text field — a document, email, chat window, or code editor — and try each mode:
+
+    **Standard transcription:**
+    1. Press `⌥ Shift Z` (or your custom hotkey)
+    2. Speak your message
+    3. Press `⌥ Shift Z` again to stop
+    4. The transcribed text is copied to your clipboard and pasted automatically
+
+    **Push-to-Talk:**
+    1. Hold `⌥ Space` while speaking
+    2. Release the key to transcribe immediately
+    3. Text is copied and ready to paste with `⌘V`
+
+    **AI Assistant mode:**
+    1. Select text in any application
+    2. Press `⌥ Shift S`
+    3. Speak your instruction (for example: "make this more formal" or "fix the grammar")
+    4. The AI processes your instruction and replaces the selected text
+
+    Press `Esc` at any point to cancel an active recording.
+
+    <Note>
+      The recording overlay appears in the corner of your screen while AutoQuill is listening. It shows the current mode, status, and a hotkey reminder. It disappears automatically after transcription completes.
+    </Note>
+  </Step>
+</Steps>
+
+## What to explore next
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Standard transcription" icon="microphone" href="/features/standard-transcription">
+    Learn about auto-copy behavior, overlay feedback, and use cases
+  </Card>
+  <Card title="AI Assistant mode" icon="wand-magic-sparkles" href="/features/ai-assistant-mode">
+    Use voice instructions to edit, rewrite, and generate text
+  </Card>
+  <Card title="Hotkey customization" icon="keyboard" href="/configuration/hotkey-customization">
+    Change shortcuts and understand conflict detection
+  </Card>
+  <Card title="Phrase replacements" icon="arrow-right-arrow-left" href="/features/phrase-replacement">
+    Set up abbreviations that expand automatically after transcription
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

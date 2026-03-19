@@ -1,0 +1,138 @@
+---
+title: "Transcription settings"
+description: "Configure smart transcription, transcription models, auto-copy behaviour, and other speech-to-text options in AutoQuill AI."
+---
+
+Transcription settings are split between **Settings → General** (output behaviour and clipboard) and **Settings → Transcription** (hotkeys, smart formatting, and local models).
+
+## Smart transcription
+
+Smart Transcription post-processes your transcribed text through Groq's `llama-3.3-70b-versatile` model before it is pasted. It applies a strict formatting engine — it does not rewrite your words, only transforms spoken formatting instructions into their intended output.
+
+Enable or disable it from the **Smart Transcription** toggle in **Settings → Transcription**.
+
+### What smart transcription does
+
+The formatting engine applies the following transformations:
+
+<AccordionGroup>
+  <Accordion title="Emoji conversion">
+    Converts spoken emoji names to actual characters. Punctuation around the emoji is removed automatically.
+
+    | Spoken | Output |
+    |--------|--------|
+    | `heart emoji` | ❤️ |
+    | `fire emoji` | 🔥 |
+    | `thumbs up emoji` | 👍 |
+  </Accordion>
+  <Accordion title="Text case formatting">
+    Applies case rules to the next sentence when you say the instruction.
+
+    | Spoken instruction | Effect |
+    |--------------------|--------|
+    | `in all caps` | Converts following clause to UPPERCASE |
+    | `in all lowercase` | Converts following clause to lowercase |
+    | `capitalize first letter` | Normal sentence casing |
+  </Accordion>
+  <Accordion title="List formatting">
+    Spoken list markers are converted to formatted lists.
+
+    - `Number 1 apples. Number 2 bananas.` → numbered list
+    - `Bullet 1 go outside. Bullet 2 read a book.` → bulleted list with `•`
+  </Accordion>
+  <Accordion title="Email and URL formatting">
+    Verbal dictation of emails and web addresses is normalised.
+
+    | Spoken | Output |
+    |--------|--------|
+    | `john dot doe at gmail dot com` | john.doe@gmail.com |
+    | `youtube dot com` | youtube.com |
+    | `https colon slash slash openai dot com` | https://openai.com |
+  </Accordion>
+  <Accordion title="Symbols and hashtags">
+    Common symbols and social tags are converted.
+
+    | Spoken | Output |
+    |--------|--------|
+    | `hashtag goals` | #goals |
+    | `100 percent` | 100% |
+    | `dollar sign 5` | $5 |
+  </Accordion>
+  <Accordion title="Quotation formatting">
+    Wraps the next phrase in quotation marks when instructed.
+
+    `say in quotes hello world` → `"hello world"`
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Smart Transcription applies a strict 4-second timeout. If the Groq API does not respond within that window, AutoQuill falls back to the original unprocessed transcription text.
+</Note>
+
+## Transcription model
+
+The active cloud transcription model is set in **Settings → General** under the Transcription Models section. See [API Setup](/configuration/api-setup#transcription-models) for a full comparison of available models.
+
+The default model is `distil-whisper-large-v3-en` (English-only, fastest).
+
+## Output behaviour
+
+These settings are in **Settings → General → Behavior Settings**.
+
+<CardGroup cols={1}>
+  <Card title="Copy last transcription to clipboard" icon="clipboard">
+    **Default: enabled**
+
+    When enabled, the transcribed text remains in your clipboard after it is pasted. When disabled, AutoQuill restores your original clipboard content after pasting, so your previous clipboard item is not overwritten.
+  </Card>
+  <Card title="Press Enter after transcription" icon="corner-down-left">
+    **Default: disabled**
+
+    When enabled, AutoQuill automatically presses Enter after pasting a transcription or assistant response. Useful in messaging apps or chat interfaces where Enter sends the message.
+  </Card>
+</CardGroup>
+
+## Local transcription (offline)
+
+AutoQuill supports on-device transcription using [WhisperKit](https://github.com/argmaxinc/WhisperKit) CoreML models. This allows transcription without an internet connection and without sending audio to Groq.
+
+Enable it from the **Enable Local Transcription** toggle in **Settings → Transcription → Local Transcription**.
+
+### Available local models
+
+| Model | Display name | Size | Accuracy | Speed |
+|-------|-------------|------|----------|-------|
+| `base` | Base | ~150 MB | Basic | Very fast |
+| `large-v3-v20240930_turbo_632MB` | Turbo | ~632 MB | Excellent | Fast |
+
+The **Turbo** model is recommended for most users. Download it from the model selection screen by clicking the download icon next to its name.
+
+<Warning>
+  Local model downloads require a Hugging Face access token because the WhisperKit CoreML models are hosted on [huggingface.co/argmaxinc/whisperkit-coreml](https://huggingface.co/argmaxinc/whisperkit-coreml). If you see an "Authorization Required" error, follow the token setup instructions shown in the app.
+</Warning>
+
+### Setting up Hugging Face authentication
+
+<Steps>
+  <Step title="Create a Hugging Face account">
+    Go to [huggingface.co](https://huggingface.co) and create a free account.
+  </Step>
+  <Step title="Generate an access token">
+    Navigate to **Settings → Access Tokens** in the Hugging Face interface and create a token with **Read** permissions.
+  </Step>
+  <Step title="Run the setup script">
+    In a Terminal window, run the setup script bundled with AutoQuill:
+
+    ```bash
+    ./setup_hf_token.sh
+    ```
+
+    Paste your token when prompted. The script stores it in the environment so AutoQuill can use it for model downloads.
+  </Step>
+</Steps>
+
+### Managing downloaded models
+
+- To open the directory where models are stored locally, click **Open Models Folder** in the Local Transcription section.
+- To delete a downloaded model, click the red trash icon next to its name in the model list.
+- To switch between downloaded models, select the radio button next to the model you want to use.

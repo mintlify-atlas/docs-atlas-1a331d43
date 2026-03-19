@@ -1,0 +1,138 @@
+---
+title: "Push-to-Talk"
+description: "Hold-to-record mode that transcribes your speech the moment you release the key."
+---
+
+Push-to-Talk mode gives you hands-on control over exactly how long you record. Hold the hotkey while you speak and release it when you're done — transcription starts immediately and the result is copied to your clipboard.
+
+## Default hotkey
+
+**Alt/Option + Space**
+
+You can change this at any time in **Settings → Hotkeys**.
+
+## How it works
+
+<Steps>
+  <Step title="Hold the hotkey">
+    Press and hold **⌥ Space** (or your custom hotkey) from any application. AutoQuill plays a start sound and shows the recording overlay. The Esc key is registered for the duration.
+  </Step>
+  <Step title="Speak while holding">
+    Dictate your message. Recording continues for as long as you hold the key.
+  </Step>
+  <Step title="Release to transcribe">
+    Release the hotkey. AutoQuill plays a stop sound and immediately begins transcribing your audio.
+  </Step>
+  <Step title="Delivery">
+    The transcribed text is trimmed, phrase replacements are applied, and the result is copied to your clipboard. If your cursor is in a text field, it is also auto-pasted.
+  </Step>
+</Steps>
+
+<Note>
+  Push-to-Talk has a **200 ms minimum hold duration**. If you release the key within 200 ms of pressing it, the recording is automatically cancelled and no transcription is performed. This prevents accidental activations.
+</Note>
+
+## Minimum hold protection
+
+To prevent unintended triggers, Push-to-Talk enforces a minimum hold duration:
+
+| Hold duration | Result |
+|---|---|
+| Less than 200 ms | Recording is cancelled automatically |
+| 200 ms or more | Recording proceeds to transcription |
+
+On first use, the system adds a short initialization delay to account for macOS startup latency. Subsequent uses respond immediately.
+
+## Overlay states
+
+| State | Description |
+|---|---|
+| Recording | Microphone is active; release key to stop |
+| Processing audio | Audio is being sent to the transcription API |
+| Transcription copied | Text is on your clipboard; overlay fades out |
+
+## Cancelling mid-hold
+
+Press **Esc** while holding (or after releasing the hotkey, while processing is still active) to cancel the current operation. AutoQuill cancels any in-flight recording or transcription request and hides the overlay.
+
+## Auto-mute
+
+If **Auto-mute system audio** is enabled in Settings, AutoQuill mutes system volume when you press the hotkey and restores it when you release. Volume is always restored, even if a recording is cancelled.
+
+## Enabling and disabling Push-to-Talk
+
+Push-to-Talk can be toggled independently of other modes:
+
+1. Open **Settings → Hotkeys**
+2. Toggle the **Push-to-Talk** switch
+
+When Push-to-Talk is disabled, pressing the hotkey has no effect.
+
+## Processing pipeline
+
+```
+Key held down
+    │
+    ▼
+Start recording  ──▶  [Overlay: Recording]
+    │
+Key released (≥ 200 ms hold)
+    │
+    ▼
+Stop recording
+    │
+    ▼
+Transcribe audio  ──▶  [Overlay: Processing]
+    │
+    ▼
+Apply phrase replacements
+    │
+    ▼
+Smart Transcription (optional)
+    │
+    ▼
+Copy to clipboard + auto-paste  ──▶  [Overlay: Copied]
+
+Key released (< 200 ms hold)
+    │
+    ▼
+Cancel recording  ──▶  [Overlay hidden]
+```
+
+## Use cases
+
+<CardGroup cols={2}>
+  <Card title="Real-time communication" icon="message-circle">
+    Quickly dictate messages in chat apps with natural start/stop control.
+  </Card>
+  <Card title="Live note-taking" icon="notebook">
+    Capture short thoughts during a meeting without leaving your keyboard.
+  </Card>
+  <Card title="Voice commands" icon="terminal">
+    Dictate short commands or search queries without switching modes.
+  </Card>
+  <Card title="Low-latency workflows" icon="zap">
+    Immediate release-to-transcribe makes Push-to-Talk the fastest mode for brief utterances.
+  </Card>
+</CardGroup>
+
+## Requirements
+
+Push-to-Talk requires either a **Groq API key** or a fully initialized **local WhisperKit model**. If neither is available, pressing the hotkey will show an error notification.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Recording is immediately cancelled">
+    You may be releasing the key in under 200 ms. Try holding the hotkey for a full second on your first use to confirm the feature is working, then adjust your technique.
+  </Accordion>
+  <Accordion title="'Another recording is in progress' message">
+    A Standard Transcription or AI Assistant recording is already active. Stop or cancel that recording before starting Push-to-Talk.
+  </Accordion>
+  <Accordion title="First use is slow or doesn't trigger">
+    On the very first use after launch, macOS needs to initialize the audio stack. Wait for AutoQuill to fully start before using Push-to-Talk for the first time.
+  </Accordion>
+  <Accordion title="Hotkey conflicts with a system shortcut">
+    Alt/Option + Space can conflict with some third-party apps. Change the Push-to-Talk hotkey in **Settings → Hotkeys** to a combination that doesn't conflict.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,122 @@
+---
+title: "Standard Transcription"
+description: "Toggle-style recording that captures your speech and delivers transcribed text directly to your clipboard."
+---
+
+Standard Transcription is AutoQuill AI's primary dictation mode. Press your hotkey once to start recording, speak your message, then press the hotkey again to stop. AutoQuill transcribes the audio, applies any phrase replacements, and copies the result to your clipboard — ready to paste anywhere on macOS.
+
+## Default hotkey
+
+**Alt/Option + Shift + Z**
+
+You can change this at any time in **Settings → Hotkeys**.
+
+## How it works
+
+<Steps>
+  <Step title="Trigger recording">
+    Press **⌥ ⇧ Z** (or your custom hotkey) from any application. AutoQuill plays a start sound and displays the recording overlay in the corner of your screen showing the current mode and hotkeys.
+  </Step>
+  <Step title="Speak your message">
+    Dictate naturally. The overlay remains visible while recording is active. The Esc key is registered during this window so you can cancel at any time.
+  </Step>
+  <Step title="Stop recording">
+    Press the same hotkey again. AutoQuill plays a stop sound, hides the overlay, and begins transcription.
+  </Step>
+  <Step title="Transcription and delivery">
+    Your audio is sent to the Groq API (or processed locally if a local model is enabled). The transcribed text is trimmed, phrase replacements are applied, and the result is copied to your clipboard. If your cursor is in a text field, the text is also auto-pasted.
+  </Step>
+</Steps>
+
+<Note>
+  If Smart Transcription is enabled in **Settings → Transcription**, the raw transcript is enhanced for punctuation and formatting before being copied. Smart Transcription adds up to 5 seconds of processing time.
+</Note>
+
+## Overlay states
+
+The recording overlay progresses through these states during a session:
+
+| State | Description |
+|---|---|
+| Recording | Microphone is active; hotkey and Esc reminder are shown |
+| Processing audio | Audio file is being sent to the transcription API |
+| Transcription copied | Text has been copied to clipboard; overlay fades out |
+
+## Cancelling a recording
+
+Press **Esc** at any time while the overlay is visible to cancel. AutoQuill will:
+
+- Stop the active recording immediately
+- Restore system volume if Auto-mute was enabled
+- Hide the overlay
+- Unregister the Esc key interceptor
+
+<Tip>
+  You can also cancel by clicking the close button on the overlay window.
+</Tip>
+
+## Auto-mute
+
+If **Auto-mute system audio** is enabled in Settings, AutoQuill mutes system volume when recording starts and restores it automatically when recording stops or is cancelled. This prevents audio playback from leaking into your dictation.
+
+## Processing pipeline
+
+```
+Hotkey pressed
+    │
+    ▼
+Start recording  ──▶  [Overlay: Recording]
+    │
+Hotkey pressed again
+    │
+    ▼
+Stop recording
+    │
+    ▼
+Transcribe audio (Groq API / local model)  ──▶  [Overlay: Processing]
+    │
+    ▼
+Apply phrase replacements
+    │
+    ▼
+Smart Transcription (optional, up to 5s)
+    │
+    ▼
+Copy to clipboard + auto-paste  ──▶  [Overlay: Copied]
+```
+
+## Requirements
+
+<CardGroup cols={2}>
+  <Card title="Groq API key" icon="key">
+    Required for cloud transcription. Add your key in **Settings → API Configuration**.
+  </Card>
+  <Card title="Local model" icon="cpu">
+    Alternatively, enable and initialize a WhisperKit local model in **Settings → Transcription**.
+  </Card>
+  <Card title="Microphone permission" icon="microphone">
+    Grant microphone access in **System Settings → Privacy & Security → Microphone**.
+  </Card>
+  <Card title="Accessibility permission" icon="accessibility">
+    Required for auto-paste. Grant in **System Settings → Privacy & Security → Accessibility**.
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Hotkey doesn't trigger recording">
+    - Confirm the hotkey is registered: open AutoQuill settings and check **Settings → Hotkeys**.
+    - Look for conflicts in **System Settings → Keyboard → Keyboard Shortcuts**.
+    - Restart AutoQuill to re-register hotkeys if they were recently changed.
+  </Accordion>
+  <Accordion title="'Recording requires a Groq API key' message">
+    Either add a Groq API key in **Settings → API Configuration**, or enable and fully initialize a local transcription model in **Settings → Transcription** before trying again.
+  </Accordion>
+  <Accordion title="Transcription is cut off or missing">
+    Make sure you wait for the start sound before speaking. The overlay must be visible before audio capture begins.
+  </Accordion>
+  <Accordion title="Auto-paste isn't working">
+    AutoQuill needs Accessibility permission to simulate a paste command. Grant it in **System Settings → Privacy & Security → Accessibility**, then restart AutoQuill.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,180 @@
+---
+title: "Contributing"
+description: "How to contribute code, bug reports, and documentation to AutoQuill AI."
+---
+
+Contributions are welcome. This page covers the full workflow from forking to merging a pull request, along with code quality standards and PR requirements.
+
+## Contribution workflow
+
+<Steps>
+  <Step title="Fork and clone">
+    Fork the repository on GitHub, then clone your fork locally:
+
+    ```bash
+    git clone https://github.com/<your-username>/autoquill_ai.git
+    cd autoquill_ai
+    ```
+  </Step>
+
+  <Step title="Set up the development environment">
+    Follow the [developer environment setup](/development/setup) guide to install Flutter, Xcode, CocoaPods, and all dependencies.
+  </Step>
+
+  <Step title="Create a feature branch">
+    Branch from `main` with a descriptive name:
+
+    ```bash
+    git checkout -b feature/amazing-feature
+    # or for bug fixes:
+    git checkout -b fix/hotkey-conflict-detection
+    ```
+  </Step>
+
+  <Step title="Make your changes">
+    Write clear, commented code that follows the patterns established in the codebase:
+
+    - Use BLoC for all stateful components
+    - Use the repository pattern for data access
+    - Keep events and states immutable; extend `Equatable`
+    - Store all persistent data through `AppStorage` or the Hive boxes registered in `injection_container.dart`
+  </Step>
+
+  <Step title="Run code quality checks">
+    All of the following must pass before opening a PR:
+
+    ```bash
+    # Static analysis — no warnings allowed
+    flutter analyze
+
+    # Code formatting
+    flutter format .
+
+    # Unit tests
+    flutter test
+    ```
+  </Step>
+
+  <Step title="Test manually on macOS">
+    Automated tests cover unit logic, but manual testing is the primary quality gate for UI and platform integration:
+
+    - Test all three transcription modes (Standard, Push-to-Talk, AI Assistant)
+    - Verify hotkeys work in at least two different applications
+    - Test with different microphone setups if your change touches audio
+    - Confirm API key management and secure storage work correctly
+    - Check the auto-update flow if you changed `AppStorage` or version handling
+  </Step>
+
+  <Step title="Commit with a clear message">
+    ```bash
+    git commit -m 'Add support for custom transcription model selection'
+    ```
+
+    Commit messages should describe *what* changed and *why*, not just how.
+  </Step>
+
+  <Step title="Push and open a pull request">
+    ```bash
+    git push origin feature/amazing-feature
+    ```
+
+    Open a pull request on GitHub with a detailed description of your changes, the problem they solve, and how you tested them.
+  </Step>
+</Steps>
+
+## Code quality commands
+
+<CodeGroup>
+
+```bash flutter analyze
+flutter analyze
+```
+
+```bash flutter format
+flutter format .
+```
+
+```bash flutter test
+flutter test
+```
+
+```bash debug build
+flutter build macos --debug
+```
+
+</CodeGroup>
+
+## PR checklist
+
+Every pull request must satisfy all of the following before it will be reviewed:
+
+- [ ] Code compiles without warnings (`flutter analyze` passes)
+- [ ] All existing tests pass (`flutter test`)
+- [ ] New functionality includes tests where applicable
+- [ ] Manual testing completed on macOS (specify macOS version in the PR description)
+- [ ] Documentation updated for any user-facing changes
+- [ ] No API keys, passwords, or other secrets added to version control
+- [ ] No security vulnerabilities introduced
+- [ ] Performance impact considered and documented if relevant
+
+## Ways to contribute
+
+<CardGroup cols={2}>
+  <Card title="Bug reports" icon="bug">
+    Open a [GitHub issue](https://github.com/DevelopedByDev/autoquill_ai/issues) with steps to reproduce, your macOS version, app version, and any console logs.
+  </Card>
+  <Card title="Feature requests" icon="lightbulb">
+    Check existing issues first, then open a new one with clear use cases. Discuss with maintainers before starting work on major changes.
+  </Card>
+  <Card title="Code contributions" icon="code">
+    High-priority areas: multi-language support, accessibility improvements, performance optimization, and additional AI provider integrations.
+  </Card>
+  <Card title="Documentation" icon="book">
+    Improve inline comments, add tutorials, translate documentation, or write technical guides for new features.
+  </Card>
+</CardGroup>
+
+## Development guidelines
+
+<AccordionGroup>
+  <Accordion title="State management patterns">
+    - Use BLoC for all stateful components — no `setState` in feature code
+    - Repository pattern for all data access; never call a data source directly from a BLoC
+    - Events and states must be immutable and extend `Equatable`
+    - BLoC files live alongside their feature module, not in a shared `blocs/` directory
+  </Accordion>
+
+  <Accordion title="Hotkey system">
+    - All hotkeys must be registered and unregistered through `HotkeyHandler` (`lib/features/hotkeys/core/hotkey_handler.dart`)
+    - Never register hotkeys synchronously on startup — registration must happen after the first UI render
+    - Always run conflict detection before saving a new hotkey combination
+    - The Escape key cancellation behaviour is global and must not be overridden
+  </Accordion>
+
+  <Accordion title="API integration">
+    - Reuse the existing `http.Client` instances; do not create new clients per request
+    - All Groq API errors must be caught and surfaced with user-friendly messages
+    - Never log API keys or response content containing user data
+    - Account for rate limits in any new API call paths
+  </Accordion>
+
+  <Accordion title="Local storage">
+    - Use `AppStorage` for settings and credentials; use the registered Hive boxes via `GetIt` for feature data
+    - Settings that need reactive UI updates should expose a `ValueListenable`
+    - Always close Hive boxes on app shutdown
+    - Test storage behaviour across simulated app updates (the `checkForAutoUpdate` path in `AppStorage`)
+  </Accordion>
+
+  <Accordion title="macOS compatibility">
+    - All changes must be compatible with macOS 10.14 (Mojave) and later
+    - Swift code in `macos/Runner/` must not use APIs introduced after macOS 10.14 without availability guards
+    - Entitlements changes require updating both `DebugProfile.entitlements` and `Release.entitlements`
+  </Accordion>
+</AccordionGroup>
+
+## Community guidelines
+
+- Be respectful and inclusive in all interactions
+- Ask questions in GitHub Discussions before starting major refactors
+- Focus on user value when proposing new features
+- Follow the standard GitHub community code of conduct

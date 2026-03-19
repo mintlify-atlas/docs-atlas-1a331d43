@@ -1,0 +1,120 @@
+---
+title: "Phrase Replacement"
+description: "Define custom abbreviations that are automatically expanded in your transcribed text."
+---
+
+Phrase Replacement lets you define shorthand terms that AutoQuill automatically expands after every transcription. Say *"my addr"* and have it expand to your full address. Use technical abbreviations, personal names, or any repeating text that you dictate frequently.
+
+Replacements are applied to Standard Transcription and Push-to-Talk output. They run before Smart Transcription enhancement so the final text always reflects your custom terms.
+
+## Setting up replacements
+
+<Steps>
+  <Step title="Open settings">
+    Go to **Settings → Transcription → Phrase Replacements**.
+  </Step>
+  <Step title="Add a replacement">
+    Enter the phrase to match in the **From** field and the expanded text in the **To** field.
+  </Step>
+  <Step title="Save">
+    Click **Save** (or press Enter). The replacement takes effect immediately for all subsequent transcriptions.
+  </Step>
+</Steps>
+
+## How matching works
+
+The replacement engine sorts all defined replacements by the length of the source phrase — **longest phrases are matched first**. This prevents a shorter rule from consuming part of a longer phrase before the longer rule has a chance to match.
+
+Matching is **case-insensitive**: the phrase `my addr` will match `My Addr`, `MY ADDR`, or `my addr` in your transcript.
+
+When a match is found, AutoQuill tracks the position of the replacement so that subsequent rules cannot overlap with already-replaced text.
+
+### Matching order example
+
+Suppose you have these replacements defined:
+
+| From | To |
+|---|---|
+| `my home address` | `123 Main St, Springfield, IL 62701` |
+| `my home` | `home office` |
+| `addr` | `address` |
+
+For the input `my home address`, the engine evaluates the longest phrase first:
+
+1. `my home address` (16 chars) — **matches** → replaced with the full address
+2. `my home` and `addr` are skipped because their positions overlap with the already-replaced range
+
+Result: `123 Main St, Springfield, IL 62701`
+
+## Replacement examples
+
+<Tabs>
+  <Tab title="Personal info">
+    | From | To |
+    |---|---|
+    | `my email` | `jane@example.com` |
+    | `my phone` | `+1 555 123 4567` |
+    | `my address` | `42 Elm Street, Portland, OR 97201` |
+    | `my name` | `Jane Doe` |
+  </Tab>
+  <Tab title="Technical terms">
+    | From | To |
+    |---|---|
+    | `k8s` | `Kubernetes` |
+    | `tf` | `Terraform` |
+    | `iam` | `IAM (Identity and Access Management)` |
+    | `api key` | `API key` |
+  </Tab>
+  <Tab title="Boilerplate text">
+    | From | To |
+    |---|---|
+    | `std disclaimer` | `The information provided is for general informational purposes only.` |
+    | `regards` | `Kind regards,\nJane Doe` |
+    | `ticket prefix` | `PROJ-` |
+  </Tab>
+</Tabs>
+
+## Which modes use phrase replacement
+
+| Mode | Phrase replacement applied |
+|---|---|
+| Standard Transcription | Yes |
+| Push-to-Talk | Yes |
+| AI Assistant Mode | No — the AI model processes the text |
+
+<Note>
+  In AI Assistant Mode, your spoken instruction is transcribed and sent directly to the AI. The AI output is not passed through phrase replacement. Define replacements for words you dictate frequently in Standard Transcription or Push-to-Talk.
+</Note>
+
+## Technical behaviour
+
+- Replacements are stored persistently in **Settings** (Hive local storage) under the key `phrase_replacements`.
+- The replacement map is loaded at transcription time, so changes take effect on the very next transcription without restarting the app.
+- If both source and target phrases are non-empty, the rule is applied. Empty rules are skipped.
+- Replacement runs over the already-trimmed transcription text.
+
+## Tips
+
+<Tip>
+  Keep source phrases short and distinctive. Single-word abbreviations like `kube` can accidentally match parts of other words. Using multi-word phrases like `kube cluster` reduces false matches.
+</Tip>
+
+<Tip>
+  Test new replacements using the built-in test page (available from the main window) before relying on them in production workflows.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="A replacement isn't expanding">
+    - Verify the **From** text exactly matches what the speech model transcribes. Say the phrase, check the raw transcript in the test page, and adjust the **From** field to match.
+    - Make sure both the **From** and **To** fields are non-empty.
+    - Case differences won't prevent a match — matching is case-insensitive.
+  </Accordion>
+  <Accordion title="A shorter phrase is being matched instead of the longer one">
+    This shouldn't happen — the engine always matches longest-first. If you see unexpected behaviour, check that the longer phrase is saved correctly in settings with no extra spaces.
+  </Accordion>
+  <Accordion title="Replacements aren't applied in AI Assistant Mode">
+    By design, phrase replacement does not run on AI Assistant Mode output. The AI model itself handles text transformation in that mode.
+  </Accordion>
+</AccordionGroup>

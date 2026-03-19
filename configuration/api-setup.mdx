@@ -1,0 +1,96 @@
+---
+title: "API Setup"
+description: "Configure your Groq API key and choose the right transcription and assistant models for your workflow."
+---
+
+AutoQuill AI uses [Groq](https://groq.com) for both audio transcription and AI assistant features. You need a Groq API key to use these features. Groq offers a free tier with generous usage limits.
+
+## Getting a Groq API key
+
+<Steps>
+  <Step title="Create a Groq account">
+    Go to [console.groq.com](https://console.groq.com) and sign up for a free account. No credit card is required to get started.
+  </Step>
+  <Step title="Generate an API key">
+    In the Groq console, navigate to **API Keys** in the sidebar. Click **Create API Key**, give it a name (for example, `AutoQuill AI`), and copy the generated key.
+  </Step>
+  <Step title="Enter the key in AutoQuill">
+    Open AutoQuill AI and go to **Settings → General**. Paste your key into the **Groq API Key** field and click **Save API Key**.
+  </Step>
+</Steps>
+
+Once saved, a confirmation indicator appears below the field. Your key is stored locally in AutoQuill's settings database and is never transmitted anywhere other than the Groq API.
+
+<Note>
+  To remove a saved key, click the **Clear** button next to the input field. AutoQuill will stop sending requests to Groq until a new key is entered.
+</Note>
+
+## Security
+
+API keys are stored in AutoQuill's local [Hive](https://docs.hivedb.dev) database under your system's Application Support directory (`~/Library/Application Support/autoquill_persistent_data`). The key is never logged, synced to the cloud, or shared with third parties.
+
+<Warning>
+  Do not share your API key publicly. If your key is compromised, revoke it immediately from the [Groq console](https://console.groq.com/keys) and generate a new one.
+</Warning>
+
+## Transcription models
+
+AutoQuill supports three Groq-hosted Whisper models for speech-to-text. You can change the active model under **Settings → General** in the Transcription Models section.
+
+<CardGroup cols={1}>
+  <Card title="Distil Whisper Large v3 (English)" icon="bolt">
+    **Model ID:** `distil-whisper-large-v3-en`
+
+    English-only model optimised for speed. This is the default and recommended choice for users who record primarily in English. Offers the fastest transcription with high accuracy for English speech.
+  </Card>
+  <Card title="Whisper Large v3 Turbo" icon="gauge">
+    **Model ID:** `whisper-large-v3-turbo`
+
+    Multilingual model with faster processing. A good balance between speed and accuracy when you need support for languages other than English.
+  </Card>
+  <Card title="Whisper Large v3" icon="star">
+    **Model ID:** `whisper-large-v3`
+
+    Multilingual model with highest accuracy. Best for complex audio, multiple languages, or situations where transcription quality matters more than speed.
+  </Card>
+</CardGroup>
+
+## Assistant models
+
+The AI Assistant mode uses a separate Groq language model to process your voice instructions and modify selected text. You can change the active model under **Settings → Assistant**.
+
+<CardGroup cols={1}>
+  <Card title="Llama 3.3 70B Versatile" icon="brain">
+    **Model ID:** `llama-3.3-70b-versatile`
+
+    The most capable option. Handles complex instructions, code generation, and nuanced rewrites well.
+  </Card>
+  <Card title="Llama 3 70B" icon="brain">
+    **Model ID:** `llama3-70b-8192`
+
+    Default assistant model. Reliable for most editing and generation tasks with an 8,192-token context window.
+  </Card>
+  <Card title="Gemma 2 9B" icon="zap">
+    **Model ID:** `gemma2-9b-it`
+
+    Lighter model for faster responses on simpler tasks. Useful when you prioritise low latency over output quality.
+  </Card>
+</CardGroup>
+
+<Tip>
+  The Smart Transcription feature (which enhances formatting after transcription) always uses `llama-3.3-70b-versatile` regardless of your assistant model selection. See [Transcription Settings](/configuration/transcription-settings) for details.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Transcription fails after saving my key">
+    Verify that the key is valid by testing it directly in the [Groq playground](https://console.groq.com/playground). If the key works there but not in AutoQuill, try clearing the key and re-entering it, then restart the app.
+  </Accordion>
+  <Accordion title="API connection errors">
+    Check that your Mac has an active internet connection. AutoQuill requires outbound HTTPS access to `api.groq.com`. If you are behind a corporate proxy or firewall, ensure that domain is reachable.
+  </Accordion>
+  <Accordion title="Rate limit errors">
+    Groq's free tier includes rate limits. If you hit them frequently, consider upgrading to a paid Groq plan or switching to a faster, lower-cost model such as `distil-whisper-large-v3-en`.
+  </Accordion>
+</AccordionGroup>

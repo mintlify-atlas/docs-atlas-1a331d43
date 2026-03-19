@@ -1,0 +1,102 @@
+---
+title: "Hotkey customization"
+description: "Change the keyboard shortcuts AutoQuill uses for transcription, push-to-talk, and AI assistant modes."
+---
+
+AutoQuill registers system-wide hotkeys so you can trigger recording from any application without switching focus. Each mode has its own configurable shortcut.
+
+## Default hotkeys
+
+| Mode | Default shortcut |
+|------|------------------|
+| Standard transcription | `⌥ ⇧ Z` |
+| Push-to-talk | `⌥ Space` |
+| AI assistant | `⌥ ⇧ S` |
+
+<Note>
+  Hotkeys are registered globally and work in any application, including full-screen apps and games. The Escape key always cancels an active recording regardless of your custom shortcuts.
+</Note>
+
+## Changing a hotkey
+
+<Steps>
+  <Step title="Open hotkey settings">
+    In AutoQuill, go to **Settings → Transcription** for transcription and push-to-talk hotkeys, or **Settings → Assistant** for the assistant hotkey.
+  </Step>
+  <Step title="Click the edit button">
+    Each hotkey row shows a pencil icon on the right. Click it to open the hotkey recording dialog.
+  </Step>
+  <Step title="Press your new combination">
+    With the dialog open, press the key combination you want to assign. The dialog captures the combination immediately — you do not need to press Enter or confirm the keys individually.
+  </Step>
+  <Step title="Save">
+    AutoQuill saves the hotkey automatically when you close the dialog. The new shortcut is registered system-wide immediately.
+  </Step>
+</Steps>
+
+To remove a hotkey without setting a replacement, click the trash icon next to the hotkey display.
+
+## Push-to-talk mode
+
+Push-to-talk is a distinct recording mode that runs alongside the standard transcription hotkey. Enable it from the toggle in **Settings → Transcription**.
+
+When push-to-talk is enabled:
+- **Hold** the push-to-talk hotkey to record.
+- **Release** to stop recording and automatically transcribe.
+- A minimum hold duration prevents accidental short recordings.
+
+Push-to-talk has its own separate hotkey that you configure independently from the standard transcription shortcut.
+
+## Conflict detection
+
+AutoQuill's hotkey system detects conflicts at registration time. If a hotkey you attempt to register is already in use by another mode, the registration is rejected and the existing assignment is preserved.
+
+<Warning>
+  AutoQuill cannot detect conflicts with hotkeys registered by other applications or by macOS system shortcuts. If a hotkey does not respond, check **System Settings → Keyboard → Keyboard Shortcuts** to see if macOS has claimed it.
+</Warning>
+
+## Recommended combinations
+
+Choosing hotkeys that work reliably across all applications requires avoiding combinations that macOS or common apps already intercept.
+
+<Tabs>
+  <Tab title="Transcription">
+    - `⌥ ⇧ Z` (default) — not used by any standard macOS shortcut
+    - `⌥ ⇧ X` — similar pattern, easy to reach
+    - `⌥ ⇧ R` — mnemonic for "record"
+    - `⌃ ⌥ Space` — comfortable for one-handed use
+  </Tab>
+  <Tab title="Push-to-talk">
+    - `⌥ Space` (default) — feels natural to hold down
+    - `⌃ Space` — beware: this is the default Spotlight shortcut
+    - `⌥ ⇧ Space` — modifier-heavy but conflict-free in most apps
+    - `⌥ V` — single-modifier combination for fast access
+  </Tab>
+  <Tab title="AI assistant">
+    - `⌥ ⇧ S` (default) — mnemonic for "smart"
+    - `⌥ ⇧ A` — mnemonic for "assistant"
+    - `⌃ ⌥ A` — avoids common app shortcuts
+    - `⌥ ⇧ E` — mnemonic for "enhance"
+  </Tab>
+</Tabs>
+
+<Tip>
+  Using `⌥` (Option) as your base modifier is a safe choice. Most macOS applications do not intercept Option-based shortcuts, so conflicts are rare.
+</Tip>
+
+## Hotkeys not responding
+
+<AccordionGroup>
+  <Accordion title="Hotkey does nothing after setting it">
+    Restart AutoQuill. On first registration, hotkeys are applied after the UI renders. A restart forces re-registration from the stored settings.
+  </Accordion>
+  <Accordion title="Hotkey works in some apps but not others">
+    Some applications (particularly games and remote desktop clients) capture keyboard input at a lower level and block system-wide hotkeys. This is a macOS limitation and cannot be worked around by AutoQuill.
+  </Accordion>
+  <Accordion title="System Settings shows a conflict">
+    Open **System Settings → Keyboard → Keyboard Shortcuts** and look for your chosen combination. Disable or reassign the conflicting system shortcut, then test again in AutoQuill.
+  </Accordion>
+  <Accordion title="Accessibility permission not granted">
+    System-wide hotkeys require the Accessibility permission. Go to **System Settings → Privacy & Security → Accessibility** and ensure AutoQuill AI is listed and enabled.
+  </Accordion>
+</AccordionGroup>

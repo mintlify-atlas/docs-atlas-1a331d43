@@ -1,0 +1,151 @@
+---
+title: "Build"
+description: "Build AutoQuill AI in debug and release modes, with commands and common troubleshooting steps."
+---
+
+## Debug build
+
+Use the debug build for day-to-day development. Hot reload and the Flutter DevTools debugger are available in this mode.
+
+<Steps>
+  <Step title="Clean the build environment (optional)">
+    Run a clean before your first build, or whenever you pull in new dependencies:
+
+    ```bash
+    flutter clean
+    ```
+  </Step>
+
+  <Step title="Fetch dependencies">
+    ```bash
+    flutter pub get
+    cd macos && pod install && cd ..
+    ```
+  </Step>
+
+  <Step title="Run on the macOS device">
+    ```bash
+    flutter run -d macos
+    ```
+
+    The app launches immediately. You can hot-reload with `r` and hot-restart with `R` from the terminal.
+  </Step>
+</Steps>
+
+## Release build
+
+A release build applies compiler optimisations and removes debug assertions. Use this to test performance or to prepare for distribution.
+
+<Steps>
+  <Step title="Build the release binary">
+    ```bash
+    flutter build macos --release
+    ```
+
+    The compiled app bundle is written to:
+
+    ```
+    build/macos/Build/Products/Release/AutoQuill.app
+    ```
+  </Step>
+
+  <Step title="Run the release app">
+    Open the built app directly from Finder, or launch it from the terminal:
+
+    ```bash
+    open build/macos/Build/Products/Release/AutoQuill.app
+    ```
+
+    <Note>
+      The release build uses `Release.entitlements` (`macos/Runner/Release.entitlements`), which enforces stricter capability constraints than the debug profile. Some features may behave differently without code signing.
+    </Note>
+  </Step>
+</Steps>
+
+## Code quality checks
+
+Run these before every commit:
+
+<CodeGroup>
+
+```bash Lint
+flutter analyze
+```
+
+```bash Format
+flutter format .
+```
+
+```bash Test
+flutter test
+```
+
+</CodeGroup>
+
+<Tip>
+  `flutter analyze` uses the rules defined in `analysis_options.yaml`, which extends `flutter_lints`. Fix all warnings — the CI pipeline treats warnings as errors.
+</Tip>
+
+## Configuration files
+
+| File | Purpose |
+|---|---|
+| `pubspec.yaml` | Dart dependencies, Flutter asset declarations, app version |
+| `analysis_options.yaml` | Lint rules (extends `flutter_lints`) |
+| `macos/Podfile` | CocoaPods native dependencies |
+| `macos/Runner/Info.plist` | App permissions, bundle ID, and metadata |
+| `macos/Runner/DebugProfile.entitlements` | Capabilities for debug and profile builds |
+| `macos/Runner/Release.entitlements` | Capabilities for release builds |
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Build errors after pulling new changes">
+    A full clean resolves most post-pull build failures:
+
+    ```bash
+    flutter clean
+    rm -rf macos/Pods
+    cd macos && pod install && cd ..
+    flutter pub get
+    flutter build macos
+    ```
+  </Accordion>
+
+  <Accordion title="CocoaPods issues">
+    If `pod install` fails, update the CocoaPods repo and retry:
+
+    ```bash
+    pod repo update
+    cd macos && pod install && cd ..
+    ```
+  </Accordion>
+
+  <Accordion title="Missing modules or import errors">
+    Ensure you are using Flutter SDK 3.1.3 or later:
+
+    ```bash
+    flutter --version
+    flutter upgrade
+    ```
+
+    Then re-run `flutter pub get`.
+  </Accordion>
+
+  <Accordion title="Icons not updating">
+    Re-generate launcher icons after changing `assets/icons/with_bg/AQOL.png`:
+
+    ```bash
+    flutter pub run flutter_launcher_icons
+    ```
+  </Accordion>
+
+  <Accordion title="Microphone or hotkeys not working in debug builds">
+    Debug builds use `DebugProfile.entitlements`. Verify that the required entitlements are present:
+
+    - `com.apple.security.device.audio-input`
+    - `com.apple.security.temporary-exception.mach-lookup.global-name`
+
+    If the hotkey manager fails to register, confirm Accessibility permission is granted in **System Settings → Privacy & Security → Accessibility**.
+  </Accordion>
+</AccordionGroup>

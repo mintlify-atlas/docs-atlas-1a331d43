@@ -1,0 +1,114 @@
+---
+title: "Hotkeys"
+description: "System-wide keyboard shortcuts that trigger AutoQuill's recording modes from any application."
+---
+
+AutoQuill AI registers global hotkeys at the system level so they work in any application — browser, code editor, email client, or terminal — without AutoQuill needing to be the focused window.
+
+## Default hotkeys
+
+| Mode | Default hotkey | Behaviour |
+|---|---|---|
+| Standard Transcription | ⌥ ⇧ Z | Toggle: press once to start, press again to stop |
+| Push-to-Talk | ⌥ Space | Hold to record, release to transcribe |
+| AI Assistant Mode | ⌥ ⇧ S | Toggle with text selection detection |
+| Cancel (during recording) | Esc | Cancels any active recording or operation |
+
+## Customising hotkeys
+
+<Steps>
+  <Step title="Open Settings">
+    Click the AutoQuill icon in the menu bar and select **Settings**, then navigate to **Hotkeys**.
+  </Step>
+  <Step title="Click a hotkey to record">
+    Click any hotkey field. A recording dialog opens and waits for your key combination.
+  </Step>
+  <Step title="Press your desired combination">
+    Press the modifier keys and the key you want to use. AutoQuill captures the combination in real time.
+    
+    While the recording dialog is open, all other hotkeys are suppressed to prevent accidental triggers.
+  </Step>
+  <Step title="Check for conflicts">
+    AutoQuill automatically checks the new combination against all currently registered hotkeys. If a conflict is detected, you will be shown which mode already uses that combination.
+  </Step>
+  <Step title="Save">
+    Confirm to save. AutoQuill immediately unregisters all existing hotkeys and re-registers them with the new combination — no restart required.
+  </Step>
+</Steps>
+
+## Conflict detection
+
+AutoQuill prevents two modes from sharing the same hotkey. When you attempt to save a hotkey that is already in use, the settings UI shows:
+
+- Which mode currently owns the conflicting hotkey
+- The exact key combination that conflicts
+
+You must choose a different combination before saving.
+
+The three modes checked for conflicts are:
+
+| Internal key | Friendly name |
+|---|---|
+| `transcription_hotkey` | Transcription |
+| `assistant_hotkey` | Assistant |
+| `push_to_talk_hotkey` | Push-to-Talk |
+
+## How system-wide registration works
+
+AutoQuill uses the `hotkey_manager` Flutter package to register hotkeys with **system scope** (`HotKeyScope.system`). This means:
+
+- Hotkeys fire regardless of which application is focused
+- The app does not need to be in the foreground
+- Hotkeys remain active as long as AutoQuill is running in the background
+
+Hotkeys are loaded **lazily** — 1 second after the UI renders — to avoid blocking startup. When you change a hotkey in Settings, AutoQuill calls `hotKeyManager.unregisterAll()` and then re-registers all three hotkeys from storage so changes take effect immediately.
+
+## The Escape key
+
+Unlike the three main hotkeys, **Esc is registered dynamically**. It is added to the system only when a recording starts and unregistered the moment a recording stops or is cancelled. This avoids interfering with Esc key behaviour in other applications when AutoQuill is idle.
+
+Esc cancels operations in this priority order:
+
+1. Standard Transcription recording
+2. AI Assistant recording
+3. Push-to-Talk recording
+4. Any ongoing transcription or API request
+5. Hides the overlay regardless of state
+
+## Modifier key symbols
+
+| Symbol | Key |
+|---|---|
+| ⌘ | Command (Meta) |
+| ⌃ | Control |
+| ⌥ | Option (Alt) |
+| ⇧ | Shift |
+
+Modifiers are displayed in the recording overlay using these symbols so you always have a quick reminder of the active hotkey.
+
+## Recommendations for custom hotkeys
+
+<Tip>
+  Use at least two modifier keys (for example ⌥ + ⇧ or ⌃ + ⌥) to reduce the chance of conflicting with application-level shortcuts. Single-modifier combinations like ⌘Z are almost always reserved by apps.
+</Tip>
+
+<Tip>
+  Avoid ⌃ + key combinations that macOS uses for terminal control characters (⌃C, ⌃D, ⌃Z). These can behave unexpectedly when AutoQuill intercepts them system-wide.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Hotkeys stop working after a system update">
+    macOS Accessibility permissions can be reset after OS updates. Open **System Settings → Privacy & Security → Accessibility**, remove AutoQuill from the list, add it again, and restart the app.
+  </Accordion>
+  <Accordion title="A hotkey fires in the recording dialog">
+    While the hotkey recording dialog is open, AutoQuill suppresses all registered hotkeys. If you see a hotkey firing unexpectedly, close the dialog and try again.
+  </Accordion>
+  <Accordion title="Hotkey changes aren't taking effect">
+    AutoQuill re-registers hotkeys immediately after saving. If changes don't apply, open **Settings → Hotkeys** and confirm the new combination is shown. If not, restart AutoQuill to reload hotkeys from storage.
+  </Accordion>
+  <Accordion title="Hotkey conflicts with a macOS system shortcut">
+    Check **System Settings → Keyboard → Keyboard Shortcuts** for conflicts. macOS system shortcuts take precedence over application-registered ones. Choose a combination that isn't already bound at the OS level.
+  </Accordion>
+</AccordionGroup>

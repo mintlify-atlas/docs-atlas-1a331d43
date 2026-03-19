@@ -1,0 +1,123 @@
+---
+title: "Common issues"
+description: "Solutions for frequently encountered problems including hotkeys not working, API connection issues, and build errors."
+---
+
+<AccordionGroup>
+  <Accordion title="Microphone permission denied">
+    AutoQuill requires microphone access to record and transcribe your voice. If you dismissed the permission prompt or denied access, the app cannot record audio.
+
+    <Steps>
+      <Step title="Open System Settings">
+        Go to **System Settings** (or **System Preferences** on macOS Ventura and earlier).
+      </Step>
+      <Step title="Navigate to microphone permissions">
+        Select **Privacy & Security** → **Microphone**.
+      </Step>
+      <Step title="Enable AutoQuill">
+        Toggle on **AutoQuill AI** in the list of apps.
+      </Step>
+      <Step title="Restart AutoQuill">
+        Quit and relaunch AutoQuill for the permission change to take effect.
+      </Step>
+    </Steps>
+
+    <Note>
+      If AutoQuill does not appear in the microphone list, try launching the app and attempting a recording — macOS will prompt you to grant access.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Hotkeys not working">
+    Global hotkeys may fail to register if there is a conflict with another application or system shortcut, or if AutoQuill lost its hotkey registration.
+
+    <Steps>
+      <Step title="Check for system shortcut conflicts">
+        Open **System Settings** → **Keyboard** → **Keyboard Shortcuts** and look for any shortcuts that overlap with your AutoQuill hotkeys.
+      </Step>
+      <Step title="Try a different key combination">
+        In AutoQuill, go to **Settings** → **Hotkeys** and assign a new combination using modifier keys (⌘, ⌥, ⌃, ⇧) to avoid conflicts.
+      </Step>
+      <Step title="Restart AutoQuill">
+        Quit and relaunch AutoQuill. The app re-registers all hotkeys on startup.
+      </Step>
+    </Steps>
+
+    <Tip>
+      AutoQuill's default hotkeys are **⌥⇧Z** (Standard Transcription), **⌥Space** (Push-to-Talk), and **⌥⇧S** (AI Assistant). If any of these conflict with your system or other apps, change them in **Settings** → **Hotkeys**.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="API connection issues">
+    Transcription failures or empty results after recording usually indicate a problem with the API key or network connection.
+
+    <Steps>
+      <Step title="Check your internet connection">
+        AutoQuill requires an active internet connection for AI-powered transcription. Verify your connection is working.
+      </Step>
+      <Step title="Verify your API key">
+        Open **Settings** → **API Configuration** and confirm your Groq API key is entered correctly. Re-paste it if unsure.
+      </Step>
+      <Step title="Try a different transcription model">
+        In **Settings** → **API Configuration**, switch to a different model to rule out model-specific outages.
+      </Step>
+    </Steps>
+
+    <Warning>
+      If smart transcription is enabled, it uses the Groq API (`llama-3.3-70b-versatile`). A timeout or invalid API key will cause the app to fall back to returning the raw transcription without enhancement.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Build errors (developing from source)">
+    Build failures when compiling from source are most commonly caused by stale CocoaPods dependencies or a dirty Flutter build cache.
+
+    Run the full clean-and-rebuild sequence:
+
+    ```bash
+    flutter clean
+    rm -rf macos/Pods
+    cd macos && pod install && cd ..
+    flutter pub get
+    flutter build macos
+    ```
+
+    <Steps>
+      <Step title="Clean Flutter build artifacts">
+        `flutter clean` removes the `build/` directory and cached compilation outputs.
+      </Step>
+      <Step title="Remove and reinstall CocoaPods">
+        Deleting `macos/Pods` and running `pod install` ensures all native dependencies are freshly resolved.
+      </Step>
+      <Step title="Restore Dart packages">
+        `flutter pub get` fetches all Dart dependencies listed in `pubspec.yaml`.
+      </Step>
+      <Step title="Rebuild">
+        `flutter build macos` performs a clean release build.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="&quot;Failed to initialize [model]&quot; error">
+    This error typically means the WhisperKit model files are incomplete or missing.
+
+    - Re-download the model from **Settings** → **Local Models**.
+    - Use the **Open Models Folder** button to verify the downloaded files are present.
+    - If downloads keep failing, see [Model download issues](/troubleshooting/model-download) for alternative methods.
+  </Accordion>
+
+  <Accordion title="&quot;Resource temporarily unavailable&quot; error">
+    This error occurs when another instance of AutoQuill is already running and has locked the audio device.
+
+    Close all other instances of AutoQuill using **Activity Monitor** (`Cmd+Space`, type `Activity Monitor`), then relaunch the app.
+  </Accordion>
+
+  <Accordion title="Auto-mute does not work during recording">
+    On macOS, the auto-mute system volume feature may be unavailable due to system security restrictions. macOS limits which apps can modify system volume, and the necessary permissions are typically reserved for system apps.
+
+    Auto-mute failures do not affect recording or transcription — audio capture continues to work normally.
+
+    **Workarounds:**
+    - Manually pause or mute your media before recording.
+    - Use Push-to-Talk mode for shorter recordings.
+    - Use headphones to isolate recording audio from playback.
+  </Accordion>
+</AccordionGroup>

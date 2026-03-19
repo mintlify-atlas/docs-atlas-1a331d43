@@ -1,0 +1,96 @@
+---
+title: "Introduction"
+description: "AutoQuill AI is a system-wide audio transcription app for macOS that converts speech to text anywhere on your computer using AI-powered hotkeys."
+---
+
+## What is AutoQuill AI?
+
+AutoQuill AI is a professional audio transcription application for macOS. Press a global hotkey in any app — your code editor, email client, document editor, or chat window — speak, and your words appear as text instantly. It is engineered for speed, built on Groq's AI models, and stores all your data locally.
+
+The welcome screen puts it simply: *"Your personal AI scribe and assistant. Engineered for speed. Designed for trust. Free for life."*
+
+## Three transcription modes
+
+<CardGroup cols={3}>
+  <Card title="Standard transcription" icon="toggle-on" href="/features/standard-transcription">
+    Press `⌥ Shift Z` to start recording. Press it again to stop. Transcribed text is copied to your clipboard and pasted automatically if a text field is active.
+  </Card>
+  <Card title="Push-to-Talk" icon="hand" href="/features/push-to-talk">
+    Hold `⌥ Space` while you speak. Release the key to transcribe instantly. Minimum-hold protection prevents accidental short recordings.
+  </Card>
+  <Card title="AI Assistant mode" icon="wand-magic-sparkles" href="/features/ai-assistant-mode">
+    Select text in any app, press `⌥ Shift S`, and speak instructions. The AI edits, rewrites, or generates new content based on your voice prompt.
+  </Card>
+</CardGroup>
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="System-wide hotkeys" icon="keyboard">
+    Global shortcuts registered at the OS level work in every application — no focus required.
+  </Card>
+  <Card title="Groq API transcription" icon="bolt">
+    Fast, accurate transcription via Groq's cloud models. Default transcription model: `distil-whisper-large-v3-en`. Default assistant model: `llama3-70b-8192`.
+  </Card>
+  <Card title="Smart transcription" icon="sparkles">
+    Optional post-processing layer that adds intelligent formatting, emoji conversion, proper casing, and structured lists. Slower, but more polished output.
+  </Card>
+  <Card title="Phrase replacements" icon="arrow-right-arrow-left">
+    Define abbreviations that expand automatically after transcription — useful for email signatures, addresses, and common phrases.
+  </Card>
+  <Card title="Privacy-first storage" icon="shield-halved">
+    All settings, API keys, and hotkey configuration are stored locally using Hive in `autoquill_persistent_data`. Nothing is sent to external servers beyond the Groq API call.
+  </Card>
+  <Card title="Real-time overlay" icon="layer-group">
+    A non-intrusive floating overlay shows current mode, recording status, and hotkey reminders without interrupting your workflow.
+  </Card>
+  <Card title="Auto-updates" icon="arrows-rotate">
+    Seamless background updates via the Sparkle framework. The app checks for new releases on startup and applies them silently.
+  </Card>
+  <Card title="No account required" icon="user-slash">
+    You supply your own Groq API key. AutoQuill does not require a login or account of any kind.
+  </Card>
+</CardGroup>
+
+## System requirements
+
+| Requirement | Minimum | Recommended |
+|---|---|---|
+| macOS | 10.14 (Mojave) | Latest stable release |
+| RAM | 4 GB | 8 GB |
+| Storage | 100 MB | — |
+| Microphone | Required | — |
+| Internet | Required for AI transcription | — |
+
+<Note>
+  AutoQuill AI requires a Groq API key for AI-powered transcription. Groq offers a free tier that is sufficient for most personal use. See [API setup](/configuration/api-setup) for instructions.
+</Note>
+
+## Permissions required
+
+AutoQuill requests three macOS permissions during onboarding:
+
+- **Microphone** — captures audio for transcription
+- **Accessibility** — enables global hotkey registration and automatic text insertion into other apps
+- **Screen recording** — used by AI Assistant mode to capture a screenshot for visual context (optional feature)
+
+<Warning>
+  Accessibility permission is required for hotkeys to function in other applications. Without it, AutoQuill can only transcribe while its own window is in focus.
+</Warning>
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Download the DMG or build from source
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Go from install to first transcription in 5 steps
+  </Card>
+  <Card title="API setup" icon="key" href="/configuration/api-setup">
+    Get and configure your Groq API key
+  </Card>
+  <Card title="Hotkey customization" icon="keyboard" href="/configuration/hotkey-customization">
+    Change the default shortcuts to fit your workflow
+  </Card>
+</CardGroup>

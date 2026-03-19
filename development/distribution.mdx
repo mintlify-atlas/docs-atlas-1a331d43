@@ -1,0 +1,295 @@
+---
+title: "Distribution"
+description: "Code signing, notarization, and DMG creation for distributing AutoQuill AI outside the Mac App Store."
+---
+
+Distributing AutoQuill AI outside the Mac App Store requires an Apple Developer Account, a Developer ID certificate, and Apple notarization. This page covers the full process.
+
+## Requirements
+
+<CardGroup cols={2}>
+  <Card title="Apple Developer Account" icon="apple">
+    Active Apple Developer Program membership ($99/year). Required for the Developer ID certificate.
+  </Card>
+  <Card title="Developer ID certificate" icon="certificate">
+    A **Developer ID Application** certificate installed in Keychain Access. Used to sign the app and DMG.
+  </Card>
+  <Card title="App-specific password" icon="key">
+    Generated at [appleid.apple.com](https://appleid.apple.com) for your Apple ID. Used only for notarization submissions.
+  </Card>
+  <Card title="Fastforge" icon="box">
+    Dart tool for creating the DMG installer. Install once with `dart pub global activate fastforge`.
+  </Card>
+</CardGroup>
+
+## One-time notarization setup
+
+Before your first distribution, store your Apple ID credentials in the macOS Keychain as a named profile:
+
+<Steps>
+  <Step title="Run the setup script">
+    ```bash
+    ./scripts/setup_notarization.sh
+    ```
+
+    The script guides you through creating an app-specific password and stores your credentials securely in Keychain under the profile name `autoquill-notary`.
+  </Step>
+
+  <Step title="Verify the profile was created">
+    ```bash
+    xcrun notarytool store-credentials --validate --keychain-profile "autoquill-notary"
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  To create the profile manually:
+
+  ```bash
+  xcrun notarytool store-credentials "autoquill-notary" \
+    --apple-id "your-apple-id@email.com" \
+    --password "xxxx-xxxx-xxxx-xxxx" \
+    --team-id "562STT95YC"
+  ```
+</Tip>
+
+## Automated build and distribution
+
+The fastest path to a signed, notarized DMG is the automated script:
+
+```bash
+./scripts/build_dmg_complete.sh
+```
+
+This single command runs all nine steps of the build pipeline and writes the final files to `dist/final/{version}/`.
+
+For a build that also prepares auto-update artifacts:
+
+```bash
+./scripts/build_and_sign.sh
+```
+
+Output:
+
+```
+dist/signed/{timestamp}/
+├── AutoQuill.app                  # Signed and notarized app bundle
+├── AutoQuill-notarized.zip        # ZIP for auto-updates via Sparkle
+└── AutoQuill-installer.dmg        # DMG for website distribution
+```
+
+## Manual build process
+
+If you need to run steps individually, follow this sequence:
+
+<Steps>
+  <Step title="Build the Flutter app">
+    ```bash
+    flutter clean
+    flutter pub get
+    flutter build macos --release
+    ```
+  </Step>
+
+  <Step title="Sign all frameworks and binaries">
+    Sign nested dylibs, frameworks, and executables with the hardened runtime flag:
+
+    ```bash
+    find "build/macos/Build/Products/Release/AutoQuill.app" -type f \
+      \( -name "*.dylib" -o -name "*.framework" -o -perm +111 \) \
+      -exec codesign --force --options runtime --timestamp \
+      --sign "Developer ID Application: Divyansh Lalwani (562STT95YC)" {} \;
+    ```
+  </Step>
+
+  <Step title="Sign the main app bundle">
+    Apply `Release.entitlements` when signing the top-level bundle:
+
+    ```bash
+    codesign --force --options runtime --timestamp \
+      --sign "Developer ID Application: Divyansh Lalwani (562STT95YC)" \
+      --entitlements "macos/Runner/Release.entitlements" \
+      "build/macos/Build/Products/Release/AutoQuill.app"
+    ```
+  </Step>
+
+  <Step title="Create the DMG">
+    ```bash
+    fastforge release --name prod --jobs macos-dmg
+    ```
+  </Step>
+
+  <Step title="Sign the DMG">
+    ```bash
+    codesign --force \
+      --sign "Developer ID Application: Divyansh Lalwani (562STT95YC)" \
+      --timestamp "dist/1.4.0+7/autoquill_ai-1.4.0+7-macos.dmg"
+    ```
+  </Step>
+
+  <Step title="Create a ZIP for notarization">
+    ```bash
+    cd "build/macos/Build/Products/Release"
+    ditto -c -k --keepParent "AutoQuill.app" "AutoQuill-notarization.zip"
+    ```
+  </Step>
+
+  <Step title="Submit for notarization">
+    ```bash
+    xcrun notarytool submit "AutoQuill-notarization.zip" \
+      --keychain-profile "autoquill-notary" \
+      --wait
+    ```
+
+    The `--wait` flag blocks until Apple returns an approval or rejection. Typical turnaround is 2–10 minutes.
+  </Step>
+
+  <Step title="Staple the notarization ticket">
+    Attach the notarization ticket to the app so it passes Gatekeeper checks offline:
+
+    ```bash
+    xcrun stapler staple "build/macos/Build/Products/Release/AutoQuill.app"
+    ```
+
+    Recreate the DMG with the notarized app, then staple the DMG as well:
+
+    ```bash
+    fastforge release --name prod --jobs macos-dmg
+    xcrun stapler staple "dist/1.4.0+7/autoquill_ai-1.4.0+7-macos.dmg"
+    ```
+  </Step>
+</Steps>
+
+## Verification commands
+
+Always verify signatures and notarization before publishing:
+
+<Tabs>
+  <Tab title="App bundle">
+    ```bash
+    # Verify code signature
+    codesign --verify --deep --strict --verbose=2 "AutoQuill.app"
+
+    # Verify Gatekeeper acceptance
+    spctl --assess --type exec --verbose "AutoQuill.app"
+
+    # Verify notarization staple
+    xcrun stapler validate "AutoQuill.app"
+    ```
+  </Tab>
+  <Tab title="DMG">
+    ```bash
+    # Verify DMG signature
+    codesign --verify --deep --strict --verbose=2 "autoquill_ai-1.4.0+7-macos.dmg"
+
+    # Verify Gatekeeper acceptance
+    spctl --assess --type open --context context:primary-signature \
+      "autoquill_ai-1.4.0+7-macos.dmg"
+
+    # Verify notarization staple
+    xcrun stapler validate "autoquill_ai-1.4.0+7-macos.dmg"
+    ```
+  </Tab>
+  <Tab title="Detailed signature info">
+    ```bash
+    codesign -dv --verbose=4 "AutoQuill.app"
+    ```
+  </Tab>
+</Tabs>
+
+## Auto-update artifacts
+
+AutoQuill AI uses the Sparkle framework for automatic updates. After building a notarized release:
+
+<Steps>
+  <Step title="Sign the update ZIP">
+    ```bash
+    dart run auto_updater:sign_update \
+      dist/final/1.4.0+7/AutoQuill-1.4.0+7-notarized.zip
+    ```
+
+    Copy the `sparkle:edSignature` and `length` values from the output.
+  </Step>
+
+  <Step title="Update appcast.xml">
+    Add a new `<item>` entry to `appcast.xml` with the new version number, download URL, and the signature from the previous step.
+  </Step>
+
+  <Step title="Upload to your server">
+    Upload both the notarized ZIP and the updated `appcast.xml` to your update server. AutoQuill checks the appcast URL on startup to detect new versions.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Fastforge not found">
+    ```bash
+    dart pub global activate fastforge
+    export PATH="$PATH":"$HOME/.pub-cache/bin"
+    ```
+  </Accordion>
+
+  <Accordion title="Notarization profile not found">
+    Re-run the setup script, or create the profile manually:
+
+    ```bash
+    xcrun notarytool store-credentials "autoquill-notary" \
+      --apple-id "your-apple-id@email.com" \
+      --password "xxxx-xxxx-xxxx-xxxx" \
+      --team-id "562STT95YC"
+    ```
+  </Accordion>
+
+  <Accordion title="Developer ID certificate not found">
+    Open Keychain Access and check for an unexpired **Developer ID Application** certificate. If it is missing, download it from the [Apple Developer portal](https://developer.apple.com/account/resources/certificates/list).
+
+    To list installed signing identities:
+
+    ```bash
+    security find-identity -v -p codesigning
+    ```
+  </Accordion>
+
+  <Accordion title="Notarization rejected — missing hardened runtime">
+    The signing steps in `build_and_sign.sh` always include `--options runtime`. If you are signing manually, ensure every `codesign` call includes `--options runtime --timestamp`.
+
+    Verify the flag is present:
+
+    ```bash
+    codesign -dv --verbose=4 "AutoQuill.app" | grep runtime
+    ```
+  </Accordion>
+
+  <Accordion title="Notarization rejected — unsigned code found">
+    Re-run the recursive signing step against all nested frameworks and dylibs before re-submitting.
+
+    To inspect notarization failure logs:
+
+    ```bash
+    xcrun notarytool history --keychain-profile "autoquill-notary"
+    xcrun notarytool log <SUBMISSION-ID> --keychain-profile "autoquill-notary"
+    ```
+  </Accordion>
+
+  <Accordion title="Script permission denied">
+    ```bash
+    chmod +x scripts/*.sh
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Distribution checklist
+
+- [ ] App built with `flutter build macos --release`
+- [ ] All frameworks and binaries signed with hardened runtime
+- [ ] App bundle signed with `Release.entitlements`
+- [ ] DMG created with fastforge
+- [ ] DMG signed with Developer ID
+- [ ] App submitted to Apple and notarization approved
+- [ ] Notarization ticket stapled to app bundle and DMG
+- [ ] Signatures verified with `codesign` and `spctl`
+- [ ] Notarization verified with `xcrun stapler validate`
+- [ ] Tested on a clean macOS system (no developer tools installed)
+- [ ] SHA256 checksums generated for published files
+- [ ] Auto-updater `appcast.xml` updated with new version signature

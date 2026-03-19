@@ -1,0 +1,92 @@
+---
+title: "Model download issues"
+description: "How to resolve WhisperKit model download failures, including the authorizationRequired error."
+---
+
+Autoquill uses [WhisperKit](https://github.com/argmaxinc/WhisperKit) for local on-device transcription. WhisperKit models are hosted on the [argmaxinc/whisperkit-coreml](https://huggingface.co/argmaxinc/whisperkit-coreml) repository on Hugging Face.
+
+If you see an **"authorizationRequired"** error when downloading a model, Hugging Face is requiring authentication before serving the model files. This is not a bug in AutoQuill — it is a Hugging Face repository access requirement.
+
+## Solution 1: Use a Hugging Face token (recommended)
+
+Creating a free Hugging Face account and generating an access token is the simplest fix.
+
+<Steps>
+  <Step title="Create a Hugging Face account">
+    Go to [huggingface.co](https://huggingface.co/) and sign up for a free account if you don't have one.
+  </Step>
+  <Step title="Generate an access token">
+    Navigate to [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) and create a new token. A read-only token is sufficient.
+  </Step>
+  <Step title="Set the environment variable">
+    Open Terminal and run:
+
+    ```bash
+    export HUGGING_FACE_HUB_TOKEN="your_token_here"
+    ```
+
+    Replace `your_token_here` with the token you generated.
+  </Step>
+  <Step title="Restart AutoQuill">
+    Quit AutoQuill and relaunch it from the same Terminal session, or set the variable in your shell profile (`.zshrc` or `.bash_profile`) so it persists across sessions.
+  </Step>
+</Steps>
+
+<Tip>
+  To make the token persistent, add `export HUGGING_FACE_HUB_TOKEN="your_token_here"` to your `~/.zshrc` file and run `source ~/.zshrc`.
+</Tip>
+
+## Solution 2: Download the model manually
+
+If you prefer not to create a Hugging Face account, you can download the model files directly in a browser.
+
+<Steps>
+  <Step title="Find the models folder">
+    In AutoQuill, open **Settings** → **Local Models** and click **Open Models Folder**. Note the path — you'll need to place files here.
+  </Step>
+  <Step title="Visit the WhisperKit repository">
+    Go to [huggingface.co/argmaxinc/whisperkit-coreml](https://huggingface.co/argmaxinc/whisperkit-coreml) and sign in with your Hugging Face account.
+  </Step>
+  <Step title="Download the model files">
+    Browse to the model variant you want (for example, `openai_whisper-base`) and download all files in that directory.
+  </Step>
+  <Step title="Place files in the models folder">
+    Move the downloaded files into the models folder you found in step 1, preserving the subdirectory structure.
+  </Step>
+  <Step title="Restart AutoQuill">
+    Relaunch AutoQuill. It will detect the model files automatically and make the model available for selection.
+  </Step>
+</Steps>
+
+## Solution 3: Use cloud transcription only
+
+If you do not need local transcription, you can skip WhisperKit models entirely and rely on the Groq cloud API.
+
+<Steps>
+  <Step title="Add a Groq API key">
+    Open **Settings** → **API Configuration** and enter a valid Groq API key. You can get one free at [console.groq.com](https://console.groq.com).
+  </Step>
+  <Step title="Disable local transcription">
+    In **Settings** → **Transcription**, disable local transcription so AutoQuill routes all audio to the Groq API.
+  </Step>
+</Steps>
+
+<Note>
+  Cloud transcription requires an active internet connection. Local transcription with WhisperKit works offline once the model is downloaded.
+</Note>
+
+## Other model errors
+
+<AccordionGroup>
+  <Accordion title="&quot;Failed to initialize [model]&quot;">
+    The model files are present but incomplete or corrupted. Delete the model directory inside the models folder, then re-download using one of the solutions above.
+  </Accordion>
+  <Accordion title="Missing modules error">
+    Ensure you are using the correct Flutter version and that all dependencies are installed:
+
+    ```bash
+    flutter pub get
+    cd macos && pod install && cd ..
+    ```
+  </Accordion>
+</AccordionGroup>
